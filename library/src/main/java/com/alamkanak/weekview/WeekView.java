@@ -658,19 +658,19 @@ public class WeekView extends View {
 
         // Draw 'All day' text.
         canvas.clipRect(0, 0, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
-        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.drawRect(0, mHeaderDaysHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
         canvas.drawText(mAllDayText, mHeaderColumnWidth / 2, mHeaderHeight + mHeaderRowPadding + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
-        canvas.drawLine(mHeaderColumnWidth, 0, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(mHeaderColumnWidth - mHourSeparatorLineWidth / 2, 0, mHeaderColumnWidth - mHourSeparatorLineWidth / 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHeaderColumnWidth, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
 
         // Draw 'All day' background.
-        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mHeaderBackgroundPaint);
-        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawRect(0, mHeaderDaysHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mHeaderBackgroundPaint);
+        canvas.drawLine(0, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, getWidth(), mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, getWidth() - mHourSeparatorLineWidth / 2, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
 
         // Draw the header row texts.
         startPixel = startFromPixel;
