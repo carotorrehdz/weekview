@@ -12,12 +12,14 @@
         android:layout_height="match_parent"
         app:allDayEventHeight="30dp"
         app:eventCornerRadius="2dp"
+        app:eventMargin="2dp"
         app:eventTextColor="@android:color/white"
         app:headerColumnPadding="8dp"
         app:headerColumnTextColor="@color/toolbar_text"
         app:headerRowPadding="20dp"
         app:hourHeight="60dp"
         app:hourSeparatorLineWidth="2dp"
+        app:overlappingEventGap="4dp"
         app:textSize="12sp" />
 
 </RelativeLayout>

@@ -35,7 +35,7 @@
             <enum name="length_long" value="2"/>
         </attr>
         <attr name="overlappingEventGap" format="dimension"/>
-        <attr name="eventMarginVertical" format="dimension"/>
+        <attr name="eventMargin" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
         <attr name="showDistinctPastFutureColor" format="boolean"/>

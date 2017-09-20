@@ -126,7 +126,7 @@ public class WeekView extends View {
     @Deprecated
     private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
-    private int mEventMarginVertical = 0;
+    private int mEventMargin = 0;
     private float mXScrollingSpeed = 1f;
     private Calendar mScrollToDay = null;
     private double mScrollToHour = -1;
@@ -344,7 +344,7 @@ public class WeekView extends View {
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
-            mEventMarginVertical = a.getDimensionPixelSize(R.styleable.WeekView_eventMarginVertical, mEventMarginVertical);
+            mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
             mShowDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, mShowDistinctPastFutureColor);
@@ -786,23 +786,27 @@ public class WeekView extends View {
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
                     // Calculate top.
-                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMarginVertical;
+                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMargin;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
-                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMarginVertical;
+                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMargin;
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
 
                     if (left < startFromPixel) {
                         left += mOverlappingEventGap;
+                    } else {
+                        left += mEventMargin * 0.5;
                     }
 
                     float right = left + mEventRects.get(i).width * mWidthPerDay;
 
                     if (right < startFromPixel + mWidthPerDay) {
                         right -= mOverlappingEventGap;
+                    } else {
+                        right -= mEventMargin * 1.5;
                     }
 
                     // Draw the event and the event name on top of it.
@@ -836,7 +840,7 @@ public class WeekView extends View {
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()) {
                     // Calculate top.
-                    float top = mHeaderRowPadding * 2 + mHeaderMarginBottom + +mTimeTextHeight / 2 + mEventMarginVertical;
+                    float top = mHeaderRowPadding * 2 + mHeaderMarginBottom + +mTimeTextHeight / 2 + mEventMargin;
 
                     // Calculate bottom.
                     float bottom = top + mEventRects.get(i).bottom;
@@ -1679,7 +1683,7 @@ public class WeekView extends View {
     }
 
     public int getEventMarginVertical() {
-        return mEventMarginVertical;
+        return mEventMargin;
     }
 
     /**
@@ -1689,7 +1693,7 @@ public class WeekView extends View {
      * @param eventMarginVertical The top and bottom margin.
      */
     public void setEventMarginVertical(int eventMarginVertical) {
-        this.mEventMarginVertical = eventMarginVertical;
+        this.mEventMargin = eventMarginVertical;
         invalidate();
     }
 
