@@ -706,7 +706,7 @@ public class WeekView extends View {
 
         // Hide everything in the first cell (top left corner).
         canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
-        canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
         canvas.drawLine(mTimeTextWidth + mHeaderColumnPadding * 2, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
@@ -714,8 +714,9 @@ public class WeekView extends View {
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
 
-        // Draw the header background.
-        canvas.drawRect(0, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        // Draw 'All day' background.
+        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mHeaderBackgroundPaint);
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
 
         // Draw the header row texts.
@@ -735,11 +736,10 @@ public class WeekView extends View {
 
             canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, mHeaderTextPaint);
             canvas.drawLine(startPixel + mWidthPerDay, 0, startPixel + mWidthPerDay, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+            canvas.drawLine(startPixel + mWidthPerDay, mHeaderTextHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay, getHeight(), mHourSeparatorPaint);
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay + mColumnGap;
         }
-
-        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
     }
 
     /**
