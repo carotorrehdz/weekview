@@ -50,7 +50,9 @@
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>
         <attr name="allDayEventHeight" format="dimension"/>
-        <attr name="allDayText" format="string" />
+        <attr name="allDayText" format="string"/>
         <attr name="scrollDuration" format="integer"/>
+
+        <attr name="headerDaysHeight" format="dimension"/>
     </declare-styleable>
 </resources>

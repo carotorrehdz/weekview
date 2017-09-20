@@ -19,6 +19,7 @@
         app:headerColumnTextColor="@color/toolbar_text"
         app:headerRowBackgroundColor="#F7F8F8"
         app:headerRowPadding="20dp"
+        app:headerDaysHeight="12dp"
         app:hourHeight="60dp"
         app:hourSeparatorLineWidth="2dp"
         app:overlappingEventGap="4dp"
