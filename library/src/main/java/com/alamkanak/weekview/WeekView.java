@@ -716,6 +716,7 @@ public class WeekView extends View {
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
         canvas.drawLine(mTimeTextWidth + mHeaderColumnPadding * 2, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
