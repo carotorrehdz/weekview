@@ -731,7 +731,6 @@ public class WeekView extends View {
             // Check if the day is today.
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            boolean sameDay = isSameDay(day, today);
 
             // Draw the day labels.
             String dayLabel = getDateTimeInterpreter().interpretDate(day);
@@ -741,6 +740,7 @@ public class WeekView extends View {
             }
 
             canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, mHeaderTextPaint);
+            canvas.drawLine(startPixel + mWidthPerDay, 0, startPixel + mWidthPerDay, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay + mColumnGap;
         }
