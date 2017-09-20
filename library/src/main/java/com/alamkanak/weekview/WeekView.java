@@ -745,6 +745,7 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, getWidth(), mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
     }
 
     /**
