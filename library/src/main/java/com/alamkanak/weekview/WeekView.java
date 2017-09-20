@@ -52,7 +52,6 @@ public class WeekView extends View {
     }
 
     private final Context mContext;
-    private Paint mTimeTextPaint;
     private float mTimeTextHeight;
     private Paint mHeaderTextPaint;
     private float mHeaderTextHeight;
@@ -131,6 +130,8 @@ public class WeekView extends View {
     private Paint mAllDayTextPaint;
     private String mAllDayText;
     private int mScrollDuration = 250;
+    private Paint mHourPaint;
+    private Paint mPeriodPaint;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -370,14 +371,19 @@ public class WeekView extends View {
         mHeaderColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mHeaderColumnPadding * 2;
 
         // Measure settings for time column.
-        mTimeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTimeTextPaint.setTextAlign(Paint.Align.RIGHT);
-        mTimeTextPaint.setTextSize(mTextSize);
-        mTimeTextPaint.setColor(mHeaderColumnTextColor);
+        mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHourPaint.setTextAlign(Paint.Align.LEFT);
+        mHourPaint.setTextSize(mTextSize);
+        mHourPaint.setColor(Color.rgb(81, 91, 94));
         Rect rect = new Rect();
-        mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
+        mHourPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
+
+        mPeriodPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPeriodPaint.setTextAlign(Paint.Align.LEFT);
+        mPeriodPaint.setTextSize(mTextSize);
+        mPeriodPaint.setColor(Color.rgb(160, 169, 170));
 
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -459,14 +465,6 @@ public class WeekView extends View {
         });
     }
 
-    // fix rotation changes
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-
-        mAreDimensionsInvalid = true;
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -519,13 +517,16 @@ public class WeekView extends View {
             float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
-            String time = getDateTimeInterpreter().interpretTime(i);
-            if (time == null) {
+            String hour = getDateTimeInterpreter().interpretTime(i);
+            String period = getDateTimeInterpreter().interpretPeriod(i);
+
+            if (hour == null || period == null) {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null time");
             }
 
             if (top < getHeight()) {
-                canvas.drawText(time, mHeaderColumnWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+                canvas.drawText(hour, mHeaderColumnPadding, top + mTimeTextHeight, mHourPaint);
+                canvas.drawText(period, mHeaderColumnPadding, top + mTimeTextHeight + mHeaderColumnPadding * 2, mPeriodPaint);
             }
         }
 
@@ -721,6 +722,14 @@ public class WeekView extends View {
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay + mColumnGap;
         }
+    }
+
+    // fix rotation changes
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+
+        mAreDimensionsInvalid = true;
     }
 
     /**
@@ -1436,7 +1445,6 @@ public class WeekView extends View {
         mTextSize = textSize;
         mTodayHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.setTextSize(mTextSize);
-        mTimeTextPaint.setTextSize(mTextSize);
         invalidate();
     }
 
@@ -1456,7 +1464,6 @@ public class WeekView extends View {
     public void setHeaderColumnTextColor(int headerColumnTextColor) {
         mHeaderColumnTextColor = headerColumnTextColor;
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
-        mTimeTextPaint.setColor(mHeaderColumnTextColor);
         invalidate();
     }
 

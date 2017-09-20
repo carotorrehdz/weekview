@@ -56,7 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
 
         // Set up a date time interpreter to interpret how the date and time will be formatted in
         // the week view. This is optional.
-        setupDateTimeInterpreter(false);
+        setupDateTimeInterpreter();
     }
 
 
@@ -69,7 +69,8 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        setupDateTimeInterpreter(id == R.id.action_week_view);
+        setupDateTimeInterpreter();
+
         switch (id) {
 //            case R.id.action_today:
 //                mWeekView.goToToday();
@@ -113,18 +114,12 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Set up a date time interpreter which will show short date values when in week view and long
-     * date values otherwise.
-     *
-     * @param shortDate True if the date values should be short.
-     */
-    private void setupDateTimeInterpreter(final boolean shortDate) {
+    private void setupDateTimeInterpreter() {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
             public String interpretDate(Calendar date) {
-                SimpleDateFormat weekdayNameFormat = new SimpleDateFormat("d EEE", Locale.getDefault());
-                String weekday = weekdayNameFormat.format(date.getTime());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("d EEE", Locale.getDefault());
+                String weekday = dateFormat.format(date.getTime());
 
                 return WordUtils.capitalize(weekday).replace(".", "");
             }
@@ -134,9 +129,19 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.HOUR_OF_DAY, hour);
                 calendar.clear(Calendar.MINUTE);
-                SimpleDateFormat hourNameFormat = new SimpleDateFormat("h:mm a", Locale.ENGLISH);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm", Locale.ENGLISH);
 
-                return hourNameFormat.format(calendar.getTime()).toLowerCase();
+                return dateFormat.format(calendar.getTime()).toLowerCase();
+            }
+
+            @Override
+            public String interpretPeriod(int hour) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.clear(Calendar.MINUTE);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("a", Locale.ENGLISH);
+
+                return dateFormat.format(calendar.getTime()).toLowerCase();
             }
         });
     }
