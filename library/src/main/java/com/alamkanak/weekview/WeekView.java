@@ -75,10 +75,6 @@ public class WeekView extends View {
     private Paint mHourSeparatorPaint;
     private float mHeaderMarginBottom;
     private Paint mTodayBackgroundPaint;
-    private Paint mFutureBackgroundPaint;
-    private Paint mPastBackgroundPaint;
-    private Paint mFutureWeekendBackgroundPaint;
-    private Paint mPastWeekendBackgroundPaint;
     private Paint mNowLinePaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
@@ -115,10 +111,6 @@ public class WeekView extends View {
     private int mHeaderRowPadding = 10;
     private int mHeaderRowBackgroundColor = Color.WHITE;
     private int mDayBackgroundColor = Color.WHITE;
-    private int mPastBackgroundColor = Color.WHITE;
-    private int mFutureBackgroundColor = Color.WHITE;
-    private int mPastWeekendBackgroundColor = 0;
-    private int mFutureWeekendBackgroundColor = 0;
     private int mNowLineColor = Color.rgb(102, 102, 102);
     private int mNowLineThickness = 5;
     private int mHourSeparatorColor = Color.rgb(232, 235, 237);
@@ -340,10 +332,6 @@ public class WeekView extends View {
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, mHeaderRowBackgroundColor);
             mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
-            mFutureBackgroundColor = a.getColor(R.styleable.WeekView_futureBackgroundColor, mFutureBackgroundColor);
-            mPastBackgroundColor = a.getColor(R.styleable.WeekView_pastBackgroundColor, mPastBackgroundColor);
-            mFutureWeekendBackgroundColor = a.getColor(R.styleable.WeekView_futureWeekendBackgroundColor, mFutureBackgroundColor); // If not set, use the same color as in the week
-            mPastWeekendBackgroundColor = a.getColor(R.styleable.WeekView_pastWeekendBackgroundColor, mPastBackgroundColor);
             mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
             mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
@@ -408,14 +396,6 @@ public class WeekView extends View {
         // Prepare day background color paint.
         mDayBackgroundPaint = new Paint();
         mDayBackgroundPaint.setColor(mDayBackgroundColor);
-        mFutureBackgroundPaint = new Paint();
-        mFutureBackgroundPaint.setColor(mFutureBackgroundColor);
-        mPastBackgroundPaint = new Paint();
-        mPastBackgroundPaint.setColor(mPastBackgroundColor);
-        mFutureWeekendBackgroundPaint = new Paint();
-        mFutureWeekendBackgroundPaint.setColor(mFutureWeekendBackgroundColor);
-        mPastWeekendBackgroundPaint = new Paint();
-        mPastWeekendBackgroundPaint.setColor(mPastWeekendBackgroundColor);
 
         // Prepare hour separator color paint.
         mHourSeparatorPaint = new Paint();
