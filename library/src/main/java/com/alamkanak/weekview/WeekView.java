@@ -123,7 +123,7 @@ public class WeekView extends View {
     private int mNowLineThickness = 5;
     private int mHourSeparatorColor = Color.rgb(232, 235, 237);
     private int mTodayBackgroundColor = Color.WHITE;
-    private int mHourSeparatorHeight = 2;
+    private int mHourSeparatorLineWidth = 2;
     private int mTodayHeaderTextColor = Color.BLACK;
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
@@ -337,7 +337,7 @@ public class WeekView extends View {
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
             mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
             mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
-            mHourSeparatorHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorHeight, mHourSeparatorHeight);
+            mHourSeparatorLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorLineWidth, mHourSeparatorLineWidth);
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
@@ -409,7 +409,7 @@ public class WeekView extends View {
         // Prepare hour separator color paint.
         mHourSeparatorPaint = new Paint();
         mHourSeparatorPaint.setStyle(Paint.Style.STROKE);
-        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
+        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorLineWidth);
         mHourSeparatorPaint.setColor(mHourSeparatorColor);
 
         // Prepare the "now" line color paint
@@ -545,7 +545,7 @@ public class WeekView extends View {
                 canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
 
-        // Draw time column right line.
+        // Draw right line.
         canvas.drawLine(mHeaderColumnWidth, 0, mHeaderColumnWidth, getHeight(), mHourSeparatorPaint);
     }
 
@@ -714,6 +714,8 @@ public class WeekView extends View {
         // Hide everything in the first cell (top left corner).
         canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.drawLine(mTimeTextWidth + mHeaderColumnPadding * 2, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
@@ -1508,12 +1510,12 @@ public class WeekView extends View {
     }
 
     public int getHourSeparatorHeight() {
-        return mHourSeparatorHeight;
+        return mHourSeparatorLineWidth;
     }
 
     public void setHourSeparatorHeight(int hourSeparatorHeight) {
-        mHourSeparatorHeight = hourSeparatorHeight;
-        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorHeight);
+        mHourSeparatorLineWidth = hourSeparatorHeight;
+        mHourSeparatorPaint.setStrokeWidth(mHourSeparatorLineWidth);
         invalidate();
     }
 

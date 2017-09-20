@@ -15,6 +15,7 @@
         app:headerColumnPadding="8dp"
         app:headerColumnTextColor="@color/toolbar_text"
         app:headerRowPadding="20dp"
+        app:hourSeparatorLineWidth="2dp"
         app:hourHeight="60dp"
         app:textSize="12sp" />
 
