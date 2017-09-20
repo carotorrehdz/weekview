@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:allDayEventHeight="30dp"
+        app:allDayText="@string/all_day"
         app:eventCornerRadius="2dp"
         app:eventMargin="2dp"
         app:eventTextColor="@android:color/white"

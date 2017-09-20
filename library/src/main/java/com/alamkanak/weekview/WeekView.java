@@ -20,7 +20,6 @@ import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -33,13 +32,11 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
 import static com.alamkanak.weekview.WeekViewUtil.today;
@@ -54,13 +51,8 @@ public class WeekView extends View {
         NONE, LEFT, RIGHT, VERTICAL
     }
 
-    @Deprecated
-    public static final int LENGTH_SHORT = 1;
-    @Deprecated
-    public static final int LENGTH_LONG = 2;
     private final Context mContext;
     private Paint mTimeTextPaint;
-    private float mTimeTextWidth;
     private float mTimeTextHeight;
     private Paint mHeaderTextPaint;
     private float mHeaderTextHeight;
@@ -123,8 +115,6 @@ public class WeekView extends View {
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
-    @Deprecated
-    private int mDayNameLength = LENGTH_LONG;
     private int mOverlappingEventGap = 0;
     private int mEventMargin = 0;
     private float mXScrollingSpeed = 1f;
@@ -137,6 +127,9 @@ public class WeekView extends View {
     private boolean mHorizontalFlingEnabled = true;
     private boolean mVerticalFlingEnabled = true;
     private int mAllDayEventHeight = 100;
+    private int mAllDayTextColor = Color.rgb(160, 168, 170);
+    private Paint mAllDayTextPaint;
+    private String mAllDayText;
     private int mScrollDuration = 250;
 
     // Listeners.
@@ -342,7 +335,6 @@ public class WeekView extends View {
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
-            mDayNameLength = a.getInteger(R.styleable.WeekView_dayNameLength, mDayNameLength);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
             mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
@@ -353,6 +345,7 @@ public class WeekView extends View {
             mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
             mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mAllDayText = a.getString(R.styleable.WeekView_allDayText);
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
         } finally {
             a.recycle();
@@ -369,6 +362,13 @@ public class WeekView extends View {
         mMinimumFlingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
         mScaledTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
 
+        // Measure settings for 'All day' column.
+        mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mAllDayTextPaint.setTextAlign(Paint.Align.CENTER);
+        mAllDayTextPaint.setTextSize(mTextSize);
+        mAllDayTextPaint.setColor(mAllDayTextColor);
+        mHeaderColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mHeaderColumnPadding * 2;
+
         // Measure settings for time column.
         mTimeTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTimeTextPaint.setTextAlign(Paint.Align.RIGHT);
@@ -378,7 +378,6 @@ public class WeekView extends View {
         mTimeTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mTimeTextHeight = rect.height();
         mHeaderMarginBottom = mTimeTextHeight / 2;
-        initTextTimeWidth();
 
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -468,24 +467,6 @@ public class WeekView extends View {
         mAreDimensionsInvalid = true;
     }
 
-    /**
-     * Initialize time column width. Calculate value with all possible hours (supposed widest text).
-     */
-    private void initTextTimeWidth() {
-        mTimeTextWidth = 0;
-
-        for (int i = 0; i < 24; i++) {
-            // Measure time string and get max width.
-            String time = getDateTimeInterpreter().interpretTime(i);
-
-            if (time == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
-            }
-
-            mTimeTextWidth = Math.max(mTimeTextWidth, mTimeTextPaint.measureText(time));
-        }
-    }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -544,7 +525,7 @@ public class WeekView extends View {
             }
 
             if (top < getHeight()) {
-                canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
+                canvas.drawText(time, mHeaderColumnWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
             }
         }
 
@@ -554,7 +535,6 @@ public class WeekView extends View {
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
-        mHeaderColumnWidth = mTimeTextWidth + mHeaderColumnPadding * 2;
         mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
         mWidthPerDay = mWidthPerDay / mNumberOfVisibleDays;
 
@@ -704,12 +684,13 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
-        // Hide everything in the first cell (top left corner).
-        canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
-        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
-        canvas.drawLine(mTimeTextWidth + mHeaderColumnPadding * 2, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        // Draw 'All day' text.
+        canvas.clipRect(0, 0, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
+        canvas.drawRect(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.drawText(mAllDayText, mHeaderColumnWidth / 2, mHeaderHeight + mHeaderRowPadding + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
+        canvas.drawLine(mHeaderColumnWidth, 0, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
@@ -1362,33 +1343,7 @@ public class WeekView extends View {
      */
     public DateTimeInterpreter getDateTimeInterpreter() {
         if (mDateTimeInterpreter == null) {
-            mDateTimeInterpreter = new DateTimeInterpreter() {
-                @Override
-                public String interpretDate(Calendar date) {
-                    try {
-                        SimpleDateFormat sdf = mDayNameLength == LENGTH_SHORT ? new SimpleDateFormat("EEEEE M/dd", Locale.getDefault()) : new SimpleDateFormat("EEE M/dd", Locale.getDefault());
-                        return sdf.format(date.getTime()).toUpperCase();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                }
-
-                @Override
-                public String interpretTime(int hour) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(Calendar.HOUR_OF_DAY, hour);
-                    calendar.set(Calendar.MINUTE, 0);
-
-                    try {
-                        SimpleDateFormat sdf = DateFormat.is24HourFormat(getContext()) ? new SimpleDateFormat("HH:mm", Locale.getDefault()) : new SimpleDateFormat("hh a", Locale.getDefault());
-                        return sdf.format(calendar.getTime());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return "";
-                    }
-                }
-            };
+            throw new IllegalStateException("You must provide a DateTimeInterpreter");
         }
 
         return mDateTimeInterpreter;
@@ -1401,9 +1356,6 @@ public class WeekView extends View {
      */
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
         this.mDateTimeInterpreter = dateTimeInterpreter;
-
-        // Refresh time column width.
-        initTextTimeWidth();
     }
 
 
@@ -1623,36 +1575,6 @@ public class WeekView extends View {
     public void setDefaultEventColor(int defaultEventColor) {
         mDefaultEventColor = defaultEventColor;
         invalidate();
-    }
-
-    /**
-     * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} and
-     * {@link #getDateTimeInterpreter()} instead.
-     *
-     * @return Either long or short day name is being used.
-     */
-    @Deprecated
-    public int getDayNameLength() {
-        return mDayNameLength;
-    }
-
-    /**
-     * Set the length of the day name displayed in the header row. Example of short day names is
-     * 'M' for 'Monday' and example of long day names is 'Mon' for 'Monday'.
-     * <p>
-     * <b>Note:</b> Use {@link #setDateTimeInterpreter(DateTimeInterpreter)} instead.
-     * </p>
-     *
-     * @param length Supported values are {@link com.alamkanak.weekview.WeekView#LENGTH_SHORT} and
-     *               {@link com.alamkanak.weekview.WeekView#LENGTH_LONG}.
-     */
-    @Deprecated
-    public void setDayNameLength(int length) {
-        if (length != LENGTH_LONG && length != LENGTH_SHORT) {
-            throw new IllegalArgumentException("length parameter must be either LENGTH_LONG or LENGTH_SHORT");
-        }
-
-        this.mDayNameLength = length;
     }
 
     public int getOverlappingEventGap() {

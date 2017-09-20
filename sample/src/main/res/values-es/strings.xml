@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Week View</string>
+    <string name="all_day">Todo el día</string>
+</resources>
