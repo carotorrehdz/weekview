@@ -16,14 +16,15 @@
         app:allDayEventHeight="30dp"
         app:allDayText="@string/all_day"
 
-        app:headerColumnPadding="8dp"
+        app:timeColumnPadding="8dp"
 
         app:headerRowPadding="20dp"
 
         app:hourHeight="60dp"
         app:minHourHeight="40dp"
         app:maxHourHeight="60dp"
-        app:hourSeparatorLineWidth="2dp"
+
+        app:gridWidth="2dp"
 
         app:eventCornerRadius="2dp"
         app:eventMargin="2dp"
