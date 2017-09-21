@@ -52,86 +52,101 @@ public class WeekView extends View {
     }
 
     private final Context mContext;
-    private float mTimeTextHeight;
-    private Paint mHeaderTextPaint;
-    private int mHeaderDaysHeight;
-    private float mHeaderHeight;
-    private GestureDetectorCompat mGestureDetector;
-    private OverScroller mScroller;
-    private PointF mCurrentOrigin = new PointF(0f, 0f);
+
+    private Direction mCurrentFlingDirection = Direction.NONE;
     private Direction mCurrentScrollDirection = Direction.NONE;
-    private Paint mHeaderBackgroundPaint;
-    private float mWidthPerDay;
-    private Paint mDayBackgroundPaint;
-    private Paint mHourSeparatorPaint;
-    private float mHeaderMarginBottom;
-    private Paint mTodayBackgroundPaint;
-    private Paint mNowLinePaint;
-    private Paint mTodayHeaderTextPaint;
-    private Paint mEventBackgroundPaint;
-    private float mHeaderColumnWidth;
+    private GestureDetectorCompat mGestureDetector;
+    private PointF mCurrentOrigin = new PointF(0f, 0f);
+    private OverScroller mScroller;
+
     private List<EventRect> mEventRects;
     private List<? extends WeekViewEvent> mPreviousPeriodEvents;
     private List<? extends WeekViewEvent> mCurrentPeriodEvents;
     private List<? extends WeekViewEvent> mNextPeriodEvents;
-    private TextPaint mEventTextPaint;
-    private Paint mHeaderColumnBackgroundPaint;
+
     private int mFetchedPeriod = -1; // the middle period the calendar has fetched.
+
     private boolean mRefreshEvents = false;
-    private Direction mCurrentFlingDirection = Direction.NONE;
+
     private ScaleGestureDetector mScaleDetector;
     private boolean mIsZooming;
     private Calendar mFirstVisibleDay;
     private Calendar mLastVisibleDay;
-    private boolean mShowFirstDayOfWeekFirst = true;
-    private int mDefaultEventColor;
+
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
-    // Attributes and their default values.
-    private int mHourHeight = 50;
-    private int mNewHourHeight = -1;
-    private int mMinHourHeight = 0; //no minimum specified (will be dynamic, based on screen)
-    private int mEffectiveMinHourHeight = mMinHourHeight; //compensates for the fact that you can't keep zooming out.
-    private int mMaxHourHeight = 250;
-    private int mColumnGap = 0;
+
     private int mFirstDayOfWeek = Calendar.MONDAY;
-    private int mTextSize = 14;
-    private int mHeaderColumnPadding = 10;
-    private int mHeaderColumnTextColor = Color.BLACK;
-    private int mNumberOfVisibleDays = 5;
-    private int mHeaderRowPadding = 10;
-    private int mHeaderRowBackgroundColor = Color.WHITE;
-    private int mDayBackgroundColor = Color.WHITE;
-    private int mNowLineColor = Color.rgb(102, 102, 102);
-    private int mNowLineThickness = 5;
-    private int mHourSeparatorColor = Color.rgb(232, 235, 237);
-    private int mTodayBackgroundColor = Color.WHITE;
-    private int mHourSeparatorLineWidth = 2;
-    private int mTodayHeaderTextColor = Color.BLACK;
-    private int mEventTextSize = 12;
-    private int mEventTextColor = Color.BLACK;
-    private int mEventPadding = 8;
-    private int mHeaderColumnBackgroundColor = Color.WHITE;
-    private boolean mIsFirstDraw = true;
-    private boolean mAreDimensionsInvalid = true;
-    private int mOverlappingEventGap = 0;
-    private int mEventMargin = 0;
-    private float mXScrollingSpeed = 1f;
-    private Calendar mScrollToDay = null;
-    private double mScrollToHour = -1;
-    private int mEventCornerRadius = 0;
-    private boolean mShowDistinctWeekendColor = false;
-    private boolean mShowNowLine = true;
-    private boolean mShowDistinctPastFutureColor = false;
-    private boolean mHorizontalFlingEnabled = true;
-    private boolean mVerticalFlingEnabled = true;
+    private int mNumberOfVisibleDays = 7;
+    private int mDayHeight;
+    private float mWidthPerDay;
+
     private int mAllDayEventHeight = 100;
     private int mAllDayTextColor = Color.rgb(160, 168, 170);
     private Paint mAllDayTextPaint;
     private String mAllDayText;
-    private int mScrollDuration = 250;
+
+    private float mTimeTextHeight;
+    private int mHourHeight = 60;
+    private int mNewHourHeight = -1;
+    private int mMaxHourHeight = 250;
+    private int mMinHourHeight = 0;
+    private int mEffectiveMinHourHeight = mMinHourHeight; // Compensates for the fact that you can't keep zooming out.
+    private int mHourSeparatorColor = Color.rgb(232, 235, 237);
+    private int mHourSeparatorLineWidth = 2;
     private Paint mHourPaint;
     private Paint mPeriodPaint;
+    private Paint mHourSeparatorPaint;
+
+    private int mTextSize = 14;
+
+    private float mHeaderHeight;
+    private Paint mHeaderTextPaint;
+    private float mHeaderMarginBottom;
+    private Paint mHeaderBackgroundPaint;
+
+    private float mHeaderColumnWidth;
+    private int mHeaderColumnPadding = 10;
+    private int mHeaderColumnTextColor = Color.BLACK;
+    private int mHeaderColumnBackgroundColor = Color.WHITE;
+    private Paint mHeaderColumnBackgroundPaint;
+
+    private int mHeaderRowPadding = 10;
+    private int mHeaderRowBackgroundColor = Color.rgb(247, 248, 248);
+
+    private int mDayBackgroundColor = Color.WHITE;
+    private Paint mDayBackgroundPaint;
+
+    private int mNowLineColor = Color.rgb(102, 102, 102);
+    private int mNowLineThickness = 5;
+    private boolean mShowNowLine = true;
+    private Paint mNowLinePaint;
+
+    private int mTodayBackgroundColor = Color.WHITE;
+    private int mTodayHeaderTextColor = Color.BLACK;
+    private Paint mTodayBackgroundPaint;
+    private Paint mTodayHeaderTextPaint;
+
+    private int mEventTextSize = 12;
+    private int mEventTextColor = Color.BLACK;
+    private int mEventPadding = 8;
+    private int mEventMargin = 0;
+    private int mEventCornerRadius = 0;
+    private int mOverlappingEventGap = 0;
+    private TextPaint mEventTextPaint;
+    private Paint mEventBackgroundPaint;
+    private int mDefaultEventColor;
+
+    private boolean mIsFirstDraw = true;
+    private boolean mAreDimensionsInvalid = true;
+
+    private int mScrollDuration = 250;
+    private float mXScrollingSpeed = 1f;
+    private Calendar mScrollToDay = null;
+    private double mScrollToHour = -1;
+
+    private boolean mHorizontalFlingEnabled = true;
+    private boolean mVerticalFlingEnabled = true;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -210,9 +225,7 @@ public class WeekView extends View {
                 return true;
             }
 
-            if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) ||
-                    (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) ||
-                    (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
+            if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) || (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) || (mCurrentFlingDirection == Direction.VERTICAL && !mVerticalFlingEnabled)) {
                 return true;
             }
 
@@ -311,45 +324,51 @@ public class WeekView extends View {
 
         // Get the attribute values (if any).
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
+
         try {
-            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
+            mDayHeight = a.getDimensionPixelSize(R.styleable.WeekView_dayHeight, mDayHeight);
+            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek); // Already set to Monday.
+            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays); // Already set to 5.
+
+            mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mAllDayText = a.getString(R.styleable.WeekView_allDayText);
+
             mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
+            mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
             mMinHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, mMinHourHeight);
             mEffectiveMinHourHeight = mMinHourHeight;
-            mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
+            mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
+            mHourSeparatorLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorLineWidth, mHourSeparatorLineWidth);
+
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
-            mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
-            mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
-            mHeaderColumnTextColor = a.getColor(R.styleable.WeekView_headerColumnTextColor, mHeaderColumnTextColor);
-            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
-            mShowFirstDayOfWeekFirst = a.getBoolean(R.styleable.WeekView_showFirstDayOfWeekFirst, mShowFirstDayOfWeekFirst);
+
+//            mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
+
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, mHeaderRowBackgroundColor);
+
+            mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
+            mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
+            mHeaderColumnTextColor = a.getColor(R.styleable.WeekView_headerColumnTextColor, mHeaderColumnTextColor);
+
             mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
+
+            mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
             mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
-            mHourSeparatorColor = a.getColor(R.styleable.WeekView_hourSeparatorColor, mHourSeparatorColor);
+
             mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
-            mHourSeparatorLineWidth = a.getDimensionPixelSize(R.styleable.WeekView_hourSeparatorLineWidth, mHourSeparatorLineWidth);
             mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
+
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
-            mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
             mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
             mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
-            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
-            mShowDistinctPastFutureColor = a.getBoolean(R.styleable.WeekView_showDistinctPastFutureColor, mShowDistinctPastFutureColor);
-            mShowDistinctWeekendColor = a.getBoolean(R.styleable.WeekView_showDistinctWeekendColor, mShowDistinctWeekendColor);
-            mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
-            mHorizontalFlingEnabled = a.getBoolean(R.styleable.WeekView_horizontalFlingEnabled, mHorizontalFlingEnabled);
-            mVerticalFlingEnabled = a.getBoolean(R.styleable.WeekView_verticalFlingEnabled, mVerticalFlingEnabled);
-            mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
-            mAllDayText = a.getString(R.styleable.WeekView_allDayText);
-            mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
 
-            mHeaderDaysHeight = a.getDimensionPixelSize(R.styleable.WeekView_headerDaysHeight, mHeaderDaysHeight);
+            mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
+            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
         } finally {
             a.recycle();
         }
@@ -507,10 +526,10 @@ public class WeekView extends View {
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
-        mWidthPerDay = getWidth() - mHeaderColumnWidth - mColumnGap * (mNumberOfVisibleDays - 1);
+        mWidthPerDay = getWidth() - mHeaderColumnWidth;
         mWidthPerDay = mWidthPerDay / mNumberOfVisibleDays;
 
-        mHeaderHeight = mHeaderDaysHeight + mAllDayEventHeight + mHourSeparatorLineWidth * 2;
+        mHeaderHeight = mDayHeight + mAllDayEventHeight + mHourSeparatorLineWidth * 2;
 
         Calendar today = today();
 
@@ -537,9 +556,9 @@ public class WeekView extends View {
             mIsFirstDraw = false;
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
-            if (today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek && mShowFirstDayOfWeekFirst) {
+            if (today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
                 int difference = (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
-                mCurrentOrigin.x += (mWidthPerDay + mColumnGap) * difference;
+                mCurrentOrigin.x += mWidthPerDay * difference;
             }
         }
 
@@ -567,8 +586,8 @@ public class WeekView extends View {
         }
 
         // Consider scroll offset.
-        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
-        float startFromPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps + mHeaderColumnWidth;
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / mWidthPerDay));
+        float startFromPixel = mCurrentOrigin.x + mWidthPerDay * leftDaysWithGaps + mHeaderColumnWidth;
         float startPixel = startFromPixel;
 
         // Prepare to iterate for each day.
@@ -593,7 +612,7 @@ public class WeekView extends View {
         // Iterate through each day.
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
         mFirstVisibleDay = (Calendar) today.clone();
-        mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / (mWidthPerDay + mColumnGap))));
+        mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / mWidthPerDay)));
 
         if (!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null) {
             mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
@@ -653,23 +672,23 @@ public class WeekView extends View {
             }
 
             // In the next iteration, start from the next day.
-            startPixel += mWidthPerDay + mColumnGap;
+            startPixel += mWidthPerDay;
         }
 
         // Draw 'All day' text.
         canvas.clipRect(0, 0, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
-        canvas.drawRect(0, mHeaderDaysHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
         canvas.drawText(mAllDayText, mHeaderColumnWidth / 2, mHeaderHeight + mHeaderRowPadding + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
         canvas.drawLine(mHeaderColumnWidth - mHourSeparatorLineWidth / 2, 0, mHeaderColumnWidth - mHourSeparatorLineWidth / 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHeaderColumnWidth, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHeaderColumnWidth, mDayHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
 
         // Draw 'All day' background.
-        canvas.drawRect(0, mHeaderDaysHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mHeaderBackgroundPaint);
-        canvas.drawLine(0, mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, getWidth(), mHeaderDaysHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
+        canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mHeaderBackgroundPaint);
+        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, getWidth(), mDayHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
         canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, getWidth() - mHourSeparatorLineWidth / 2, mHeaderHeight + mHeaderRowPadding * 2 - mHourSeparatorLineWidth / 2, mHourSeparatorPaint);
 
         // Draw the header row texts.
@@ -687,11 +706,11 @@ public class WeekView extends View {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
             }
 
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderDaysHeight + mHeaderRowPadding, mHeaderTextPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, 0, startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, mHeaderDaysHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, mHeaderDaysHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, getHeight(), mHourSeparatorPaint);
+            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mDayHeight + mHeaderRowPadding, mHeaderTextPaint);
+            canvas.drawLine(startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, 0, startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, mDayHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+            canvas.drawLine(startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, mDayHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay - mHourSeparatorLineWidth / 2, getHeight(), mHourSeparatorPaint);
             drawAllDayEvents(day, startPixel, canvas);
-            startPixel += mWidthPerDay + mColumnGap;
+            startPixel += mWidthPerDay;
         }
     }
 
@@ -711,8 +730,8 @@ public class WeekView extends View {
      * @return The time and date at the clicked position.
      */
     private Calendar getTimeFromPoint(float x, float y) {
-        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
-        float startPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps + mHeaderColumnWidth;
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / mWidthPerDay));
+        float startPixel = mCurrentOrigin.x + mWidthPerDay * leftDaysWithGaps + mHeaderColumnWidth;
 
         for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             float start = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
@@ -729,7 +748,7 @@ public class WeekView extends View {
                 return day;
             }
 
-            startPixel += mWidthPerDay + mColumnGap;
+            startPixel += mWidthPerDay;
         }
 
         return null;
@@ -1368,15 +1387,6 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getColumnGap() {
-        return mColumnGap;
-    }
-
-    public void setColumnGap(int columnGap) {
-        mColumnGap = columnGap;
-        invalidate();
-    }
-
     public int getFirstDayOfWeek() {
         return mFirstDayOfWeek;
     }
@@ -1397,14 +1407,6 @@ public class WeekView extends View {
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         mFirstDayOfWeek = firstDayOfWeek;
         invalidate();
-    }
-
-    public boolean isShowFirstDayOfWeekFirst() {
-        return mShowFirstDayOfWeekFirst;
-    }
-
-    public void setShowFirstDayOfWeekFirst(boolean show) {
-        mShowFirstDayOfWeekFirst = show;
     }
 
     public int getTextSize() {
@@ -1633,53 +1635,6 @@ public class WeekView extends View {
     }
 
     /**
-     * Whether weekends should have a background color different from the normal day background
-     * color. The weekend background colors are defined by the attributes
-     * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
-     *
-     * @return True if weekends should have different background colors.
-     */
-    public boolean isShowDistinctWeekendColor() {
-        return mShowDistinctWeekendColor;
-    }
-
-    /**
-     * Set whether weekends should have a background color different from the normal day background
-     * color. The weekend background colors are defined by the attributes
-     * `futureWeekendBackgroundColor` and `pastWeekendBackgroundColor`.
-     *
-     * @param showDistinctWeekendColor True if weekends should have different background colors.
-     */
-    public void setShowDistinctWeekendColor(boolean showDistinctWeekendColor) {
-        this.mShowDistinctWeekendColor = showDistinctWeekendColor;
-        invalidate();
-    }
-
-    /**
-     * Whether past and future days should have two different background colors. The past and
-     * future day colors are defined by the attributes `futureBackgroundColor` and
-     * `pastBackgroundColor`.
-     *
-     * @return True if past and future days should have two different background colors.
-     */
-    public boolean isShowDistinctPastFutureColor() {
-        return mShowDistinctPastFutureColor;
-    }
-
-    /**
-     * Set whether weekends should have a background color different from the normal day background
-     * color. The past and future day colors are defined by the attributes `futureBackgroundColor`
-     * and `pastBackgroundColor`.
-     *
-     * @param showDistinctPastFutureColor True if past and future should have two different
-     *                                    background colors.
-     */
-    public void setShowDistinctPastFutureColor(boolean showDistinctPastFutureColor) {
-        this.mShowDistinctPastFutureColor = showDistinctPastFutureColor;
-        invalidate();
-    }
-
-    /**
      * Get whether "now" line should be displayed. "Now" line is defined by the attributes
      * `nowLineColor` and `nowLineThickness`.
      *
@@ -1830,7 +1785,7 @@ public class WeekView extends View {
     }
 
     private void goToNearestOrigin() {
-        double leftDays = mCurrentOrigin.x / (mWidthPerDay + mColumnGap);
+        double leftDays = mCurrentOrigin.x / mWidthPerDay;
 
         if (mCurrentFlingDirection != Direction.NONE) {
             // snap to nearest day
@@ -1846,7 +1801,7 @@ public class WeekView extends View {
             leftDays = Math.round(leftDays);
         }
 
-        int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * (mWidthPerDay + mColumnGap));
+        int nearestOrigin = (int) (mCurrentOrigin.x - leftDays * mWidthPerDay);
 
         if (nearestOrigin != 0) {
             // Stop current animation.
@@ -1941,7 +1896,7 @@ public class WeekView extends View {
         long dateInMillis = date.getTimeInMillis() + date.getTimeZone().getOffset(date.getTimeInMillis());
         long todayInMillis = today.getTimeInMillis() + today.getTimeZone().getOffset(today.getTimeInMillis());
         long dateDifference = (dateInMillis / day) - (todayInMillis / day);
-        mCurrentOrigin.x = -dateDifference * (mWidthPerDay + mColumnGap);
+        mCurrentOrigin.x = -dateDifference * mWidthPerDay;
         invalidate();
     }
 

@@ -20,7 +20,6 @@
         <attr name="columnGap" format="dimension"/>
         <attr name="headerColumnTextColor" format="color"/>
         <attr name="noOfVisibleDays" format="integer"/>
-        <attr name="showFirstDayOfWeekFirst" format="boolean"/>
         <attr name="headerRowBackgroundColor" format="color"/>
         <attr name="dayBackgroundColor" format="color"/>
         <attr name="hourSeparatorColor" format="color"/>
@@ -38,8 +37,6 @@
         <attr name="eventMargin" format="dimension"/>
         <attr name="xScrollingSpeed" format="float"/>
         <attr name="eventCornerRadius" format="dimension"/>
-        <attr name="showDistinctPastFutureColor" format="boolean"/>
-        <attr name="showDistinctWeekendColor" format="boolean"/>
         <attr name="futureBackgroundColor" format="color"/>
         <attr name="pastBackgroundColor" format="color"/>
         <attr name="futureWeekendBackgroundColor" format="color"/>
@@ -53,6 +50,6 @@
         <attr name="allDayText" format="string"/>
         <attr name="scrollDuration" format="integer"/>
 
-        <attr name="headerDaysHeight" format="dimension"/>
+        <attr name="dayHeight" format="dimension"/>
     </declare-styleable>
 </resources>
