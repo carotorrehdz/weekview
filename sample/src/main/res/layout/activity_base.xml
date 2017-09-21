@@ -10,30 +10,20 @@
         android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        app:dayHeight="12dp"
-
         app:allDayEventHeight="30dp"
         app:allDayText="@string/all_day"
-
-        app:timeColumnPadding="8dp"
-
-        app:headerRowPadding="20dp"
-
-        app:hourHeight="60dp"
-        app:minHourHeight="40dp"
-        app:maxHourHeight="60dp"
-
-        app:gridThickness="2dp"
-
-        app:nowLineThickness="0.5dp"
-
+        app:dayHeight="12dp"
         app:eventCornerRadius="2dp"
         app:eventMargin="2dp"
-        app:eventTextColor="@android:color/white"
-        app:overlappingEventGap="4dp"
+        app:eventPadding="8dp"
         app:eventTextSize="10dp"
-
-        app:textSize="14sp" />
-
+        app:gridThickness="2dp"
+        app:headerRowPadding="20dp"
+        app:hourHeight="60dp"
+        app:maxHourHeight="60dp"
+        app:minHourHeight="40dp"
+        app:nowLineThickness="0.5dp"
+        app:overlappingEventGap="4dp"
+        app:textSize="14sp"
+        app:timeColumnPadding="8dp" />
 </RelativeLayout>

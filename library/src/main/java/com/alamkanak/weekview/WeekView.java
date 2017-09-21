@@ -92,13 +92,22 @@ public class WeekView extends View {
     private int mGrayTextColor = Color.rgb(160, 168, 170);
     private int mRedTextColor = Color.rgb(255, 67, 55);
 
-    private float mWidthPerDay;
-    private int mDayHeight = 0;
-    private int mFirstDayOfWeek = Calendar.MONDAY;
-    private int mNumberOfVisibleDays = 7;
+    private int mTextSize = 0;
+
+    private Paint mBackgroundPaint;
 
     private int mGridColor = Color.rgb(232, 235, 237);
     private int mGridThickness = 0;
+
+    private float mWidthPerDay;
+    private int mDayHeight = 0;
+    private int mFirstDayOfWeek = Calendar.MONDAY;
+    private int mNumberOfVisibleDays = 5;
+    // TODO
+    private float mHeaderHeight;
+    private Paint mHeaderTextPaint;
+    private float mHeaderMarginBottom;
+    private int mHeaderRowPadding = 0;
 
     private int mAllDayEventHeight = 0;
     private Paint mAllDayBackgroundPaint;
@@ -106,41 +115,28 @@ public class WeekView extends View {
     private String mAllDayText;
 
     private float mTimeColumnWidth;
-    private int mTimeColumnPadding = 0;
-
     private float mTimeTextHeight;
+    private int mEffectiveMinHourHeight = 0;
     private int mHourHeight = 0;
     private int mMaxHourHeight = 0;
     private int mMinHourHeight = 0;
-    private int mEffectiveMinHourHeight = mMinHourHeight; // Compensates for the fact that you can't keep zooming out.
     private int mNewHourHeight = -1;
+    private int mTimeColumnPadding = 0;
     private Paint mHourPaint;
     private Paint mHourSeparatorPaint;
     private Paint mPeriodPaint;
 
-    private int mTextSize = 14;
-
-    private float mHeaderHeight;
-    private Paint mHeaderTextPaint;
-    private float mHeaderMarginBottom;
-    private int mHeaderRowPadding = 10;
-
-    private Paint mBackgroundPaint;
-
-    private boolean mShowNowLine = true;
     private int mNowLineColor = Color.rgb(81, 91, 94);
     private int mNowLineThickness = 0;
     private Paint mNowLinePaint;
 
-    private int mEventTextSize = 12;
-    private int mEventTextColor = Color.BLACK;
-    private int mEventPadding = 8;
-    private int mEventMargin = 0;
     private int mEventCornerRadius = 0;
+    private int mEventMargin = 0;
+    private int mEventPadding = 0;
+    private int mEventTextSize = 0;
     private int mOverlappingEventGap = 0;
-    private TextPaint mEventTextPaint;
     private Paint mEventBackgroundPaint;
-    private int mDefaultEventColor;
+    private TextPaint mEventTextPaint;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -320,37 +316,26 @@ public class WeekView extends View {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.WeekView, 0, 0);
 
         try {
+            mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
+            mGridThickness = a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness);
             mDayHeight = a.getDimensionPixelSize(R.styleable.WeekView_dayHeight, mDayHeight);
-            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek); // Already set to Monday.
-            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays); // Already set to 5.
-
+            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
+            mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
+            // TODO
+            mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mAllDayText = a.getString(R.styleable.WeekView_allDayText);
-
             mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
             mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
             mMinHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, mMinHourHeight);
             mEffectiveMinHourHeight = mMinHourHeight;
-
-            mGridThickness = a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness);
-
-            mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
-
-            mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
-
             mTimeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, mTimeColumnPadding);
-
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
-
-            mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
-            mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
-            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
-            mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
-            mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
-
-            mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
-            mXScrollingSpeed = a.getFloat(R.styleable.WeekView_xScrollingSpeed, mXScrollingSpeed);
+            mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
+            mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
+            mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
+            mOverlappingEventGap = a.getDimensionPixelSize(R.styleable.WeekView_overlappingEventGap, mOverlappingEventGap);
         } finally {
             a.recycle();
         }
@@ -420,11 +405,8 @@ public class WeekView extends View {
         // Prepare event text size and color.
         mEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         mEventTextPaint.setStyle(Paint.Style.FILL);
-        mEventTextPaint.setColor(mEventTextColor);
+        mEventTextPaint.setColor(Color.WHITE);
         mEventTextPaint.setTextSize(mEventTextSize);
-
-        // Set default event color.
-        mDefaultEventColor = Color.WHITE;
 
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
@@ -629,7 +611,7 @@ public class WeekView extends View {
             drawEvents(day, startPixel, canvas);
 
             // Draw the line at the current time.
-            if (mShowNowLine && sameDay) {
+            if (sameDay) {
                 float startY = mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * mHourHeight;
@@ -762,7 +744,7 @@ public class WeekView extends View {
                             bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? Color.WHITE : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     } else {
@@ -811,7 +793,7 @@ public class WeekView extends View {
                             bottom > 0
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? Color.WHITE : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     } else {
@@ -880,42 +862,6 @@ public class WeekView extends View {
             canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
             textLayout.draw(canvas);
             canvas.restore();
-        }
-    }
-
-    /**
-     * A class to hold reference to the events and their visual representation. An EventRect is
-     * actually the rectangle that is drawn on the calendar for a given event. There may be more
-     * than one rectangle for a single event (an event that expands more than one day). In that
-     * case two instances of the EventRect will be used for a single event. The given event will be
-     * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
-     * instance will be stored in "event".
-     */
-    private class EventRect {
-        public WeekViewEvent event;
-        public WeekViewEvent originalEvent;
-        public RectF rectF;
-        public float left;
-        public float width;
-        public float top;
-        public float bottom;
-
-        /**
-         * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
-         * on the calendar for a given event. There may be more than one rectangle for a single
-         * event (an event that expands more than one day). In that case two instances of the
-         * EventRect will be used for a single event. The given event will be stored in
-         * "originalEvent". But the event that corresponds to rectangle the rectangle instance will
-         * be stored in "event".
-         *
-         * @param event         Represents the event which this instance of rectangle represents.
-         * @param originalEvent The original event that was passed by the user.
-         * @param rectF         The rectangle.
-         */
-        public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
-            this.event = event;
-            this.rectF = rectF;
-            this.originalEvent = originalEvent;
         }
     }
 
@@ -1217,12 +1163,7 @@ public class WeekView extends View {
         mAreDimensionsInvalid = true;
     }
 
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Functions related to setting and getting the properties.
-    //
-    /////////////////////////////////////////////////////////////////
-
+    // region Properties.
     public void setOnEventClickListener(EventClickListener listener) {
         this.mEventClickListener = listener;
     }
@@ -1291,14 +1232,6 @@ public class WeekView extends View {
         return mEmptyViewLongPressListener;
     }
 
-    public void setScrollListener(ScrollListener scrolledListener) {
-        this.mScrollListener = scrolledListener;
-    }
-
-    public ScrollListener getScrollListener() {
-        return mScrollListener;
-    }
-
     /**
      * Get the interpreter which provides the text to show in the header column and the header row.
      *
@@ -1320,328 +1253,9 @@ public class WeekView extends View {
     public void setDateTimeInterpreter(DateTimeInterpreter dateTimeInterpreter) {
         this.mDateTimeInterpreter = dateTimeInterpreter;
     }
+    // endregion
 
-
-    /**
-     * Get the number of visible days in a week.
-     *
-     * @return The number of visible days in a week.
-     */
-    public int getNumberOfVisibleDays() {
-        return mNumberOfVisibleDays;
-    }
-
-    /**
-     * Set the number of visible days in a week.
-     *
-     * @param numberOfVisibleDays The number of visible days in a week.
-     */
-    public void setNumberOfVisibleDays(int numberOfVisibleDays) {
-        this.mNumberOfVisibleDays = numberOfVisibleDays;
-        mCurrentOrigin.x = 0;
-        mCurrentOrigin.y = 0;
-        invalidate();
-    }
-
-    public int getHourHeight() {
-        return mHourHeight;
-    }
-
-    public void setHourHeight(int hourHeight) {
-        mNewHourHeight = hourHeight;
-        invalidate();
-    }
-
-    public int getFirstDayOfWeek() {
-        return mFirstDayOfWeek;
-    }
-
-    /**
-     * Set the first day of the week. First day of the week is used only when the week view is first
-     * drawn. It does not of any effect after user starts scrolling horizontally.
-     * <p>
-     * <b>Note:</b> This method will only work if the week view is set to display more than 6 days at
-     * once.
-     * </p>
-     *
-     * @param firstDayOfWeek The supported values are {@link java.util.Calendar#SUNDAY},
-     *                       {@link java.util.Calendar#MONDAY}, {@link java.util.Calendar#TUESDAY},
-     *                       {@link java.util.Calendar#WEDNESDAY}, {@link java.util.Calendar#THURSDAY},
-     *                       {@link java.util.Calendar#FRIDAY}.
-     */
-    public void setFirstDayOfWeek(int firstDayOfWeek) {
-        mFirstDayOfWeek = firstDayOfWeek;
-        invalidate();
-    }
-
-    public int getTextSize() {
-        return mTextSize;
-    }
-
-    public void setTextSize(int textSize) {
-        mTextSize = textSize;
-        mHeaderTextPaint.setTextSize(mTextSize);
-        invalidate();
-    }
-
-    public int getHeaderColumnPadding() {
-        return mTimeColumnPadding;
-    }
-
-    public void setHeaderColumnPadding(int headerColumnPadding) {
-        mTimeColumnPadding = headerColumnPadding;
-        invalidate();
-    }
-
-    public int getHeaderRowPadding() {
-        return mHeaderRowPadding;
-    }
-
-    public void setHeaderRowPadding(int headerRowPadding) {
-        mHeaderRowPadding = headerRowPadding;
-        invalidate();
-    }
-
-    public int getHourSeparatorColor() {
-        return mGridColor;
-    }
-
-    public void setHourSeparatorColor(int hourSeparatorColor) {
-        mGridColor = hourSeparatorColor;
-        mHourSeparatorPaint.setColor(mGridColor);
-        invalidate();
-    }
-
-    public int getEventTextSize() {
-        return mEventTextSize;
-    }
-
-    public void setEventTextSize(int eventTextSize) {
-        mEventTextSize = eventTextSize;
-        mEventTextPaint.setTextSize(mEventTextSize);
-        invalidate();
-    }
-
-    public int getEventTextColor() {
-        return mEventTextColor;
-    }
-
-    public void setEventTextColor(int eventTextColor) {
-        mEventTextColor = eventTextColor;
-        mEventTextPaint.setColor(mEventTextColor);
-        invalidate();
-    }
-
-    public int getEventPadding() {
-        return mEventPadding;
-    }
-
-    public void setEventPadding(int eventPadding) {
-        mEventPadding = eventPadding;
-        invalidate();
-    }
-
-    public int getDefaultEventColor() {
-        return mDefaultEventColor;
-    }
-
-    public void setDefaultEventColor(int defaultEventColor) {
-        mDefaultEventColor = defaultEventColor;
-        invalidate();
-    }
-
-    public int getOverlappingEventGap() {
-        return mOverlappingEventGap;
-    }
-
-    /**
-     * Set the gap between overlapping events.
-     *
-     * @param overlappingEventGap The gap between overlapping events.
-     */
-    public void setOverlappingEventGap(int overlappingEventGap) {
-        this.mOverlappingEventGap = overlappingEventGap;
-        invalidate();
-    }
-
-    public int getEventCornerRadius() {
-        return mEventCornerRadius;
-    }
-
-    /**
-     * Set corner radius for event rect.
-     *
-     * @param eventCornerRadius the radius in px.
-     */
-    public void setEventCornerRadius(int eventCornerRadius) {
-        mEventCornerRadius = eventCornerRadius;
-    }
-
-    public int getEventMarginVertical() {
-        return mEventMargin;
-    }
-
-    /**
-     * Set the top and bottom margin of the event. The event will release this margin from the top
-     * and bottom edge. This margin is useful for differentiation consecutive events.
-     *
-     * @param eventMarginVertical The top and bottom margin.
-     */
-    public void setEventMarginVertical(int eventMarginVertical) {
-        this.mEventMargin = eventMarginVertical;
-        invalidate();
-    }
-
-    /**
-     * Returns the first visible day in the week view.
-     *
-     * @return The first visible day in the week view.
-     */
-    public Calendar getFirstVisibleDay() {
-        return mFirstVisibleDay;
-    }
-
-    /**
-     * Returns the last visible day in the week view.
-     *
-     * @return The last visible day in the week view.
-     */
-    public Calendar getLastVisibleDay() {
-        return mLastVisibleDay;
-    }
-
-    /**
-     * Get the scrolling speed factor in horizontal direction.
-     *
-     * @return The speed factor in horizontal direction.
-     */
-    public float getXScrollingSpeed() {
-        return mXScrollingSpeed;
-    }
-
-    /**
-     * Sets the speed for horizontal scrolling.
-     *
-     * @param xScrollingSpeed The new horizontal scrolling speed.
-     */
-    public void setXScrollingSpeed(float xScrollingSpeed) {
-        this.mXScrollingSpeed = xScrollingSpeed;
-    }
-
-    /**
-     * Get whether "now" line should be displayed. "Now" line is defined by the attributes
-     * `nowLineColor` and `nowLineThickness`.
-     *
-     * @return True if "now" line should be displayed.
-     */
-    public boolean isShowNowLine() {
-        return mShowNowLine;
-    }
-
-    /**
-     * Set whether "now" line should be displayed. "Now" line is defined by the attributes
-     * `nowLineColor` and `nowLineThickness`.
-     *
-     * @param showNowLine True if "now" line should be displayed.
-     */
-    public void setShowNowLine(boolean showNowLine) {
-        this.mShowNowLine = showNowLine;
-        invalidate();
-    }
-
-    /**
-     * Get the "now" line thickness.
-     *
-     * @return The thickness of the "now" line.
-     */
-    public int getNowLineThickness() {
-        return mNowLineThickness;
-    }
-
-    /**
-     * Set the "now" line thickness.
-     *
-     * @param nowLineThickness The thickness of the "now" line.
-     */
-    public void setNowLineThickness(int nowLineThickness) {
-        this.mNowLineThickness = nowLineThickness;
-        invalidate();
-    }
-
-    /**
-     * Get whether the week view should fling horizontally.
-     *
-     * @return True if the week view has horizontal fling enabled.
-     */
-    public boolean isHorizontalFlingEnabled() {
-        return mHorizontalFlingEnabled;
-    }
-
-    /**
-     * Set whether the week view should fling horizontally.
-     *
-     * @return True if it should have horizontal fling enabled.
-     */
-    public void setHorizontalFlingEnabled(boolean enabled) {
-        mHorizontalFlingEnabled = enabled;
-    }
-
-    /**
-     * Get whether the week view should fling vertically.
-     *
-     * @return True if the week view has vertical fling enabled.
-     */
-    public boolean isVerticalFlingEnabled() {
-        return mVerticalFlingEnabled;
-    }
-
-    /**
-     * Set whether the week view should fling vertically.
-     *
-     * @return True if it should have vertical fling enabled.
-     */
-    public void setVerticalFlingEnabled(boolean enabled) {
-        mVerticalFlingEnabled = enabled;
-    }
-
-    /**
-     * Get the height of AllDay-events.
-     *
-     * @return Height of AllDay-events.
-     */
-    public int getAllDayEventHeight() {
-        return mAllDayEventHeight;
-    }
-
-    /**
-     * Set the height of AllDay-events.
-     */
-    public void setAllDayEventHeight(int height) {
-        mAllDayEventHeight = height;
-    }
-
-    /**
-     * Get scroll duration
-     *
-     * @return scroll duration
-     */
-    public int getScrollDuration() {
-        return mScrollDuration;
-    }
-
-    /**
-     * Set the scroll duration
-     */
-    public void setScrollDuration(int scrollDuration) {
-        mScrollDuration = scrollDuration;
-    }
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Functions related to scrolling.
-    //
-    /////////////////////////////////////////////////////////////////
-
+    // region Functions related to scrolling.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
@@ -1724,13 +1338,9 @@ public class WeekView extends View {
             return false;
         }
     }
+    // endregion
 
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Public methods.
-    //
-    /////////////////////////////////////////////////////////////////
+    // region Public methods.
 
     /**
      * Show today on the week view.
@@ -1815,13 +1425,9 @@ public class WeekView extends View {
     public double getFirstVisibleHour() {
         return -mCurrentOrigin.y / mHourHeight;
     }
+    // endregion
 
-
-    /////////////////////////////////////////////////////////////////
-    //
-    //      Interfaces.
-    //
-    /////////////////////////////////////////////////////////////////
+    // region Interfaces.
 
     public interface EventClickListener {
         /**
@@ -1872,4 +1478,44 @@ public class WeekView extends View {
          */
         void onFirstVisibleDayChanged(Calendar newFirstVisibleDay, Calendar oldFirstVisibleDay);
     }
+    // endregion
+
+    // region Inner classes
+
+    /**
+     * A class to hold reference to the events and their visual representation. An EventRect is
+     * actually the rectangle that is drawn on the calendar for a given event. There may be more
+     * than one rectangle for a single event (an event that expands more than one day). In that
+     * case two instances of the EventRect will be used for a single event. The given event will be
+     * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
+     * instance will be stored in "event".
+     */
+    private class EventRect {
+        WeekViewEvent event;
+        WeekViewEvent originalEvent;
+        RectF rectF;
+        float left;
+        float width;
+        float top;
+        float bottom;
+
+        /**
+         * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
+         * on the calendar for a given event. There may be more than one rectangle for a single
+         * event (an event that expands more than one day). In that case two instances of the
+         * EventRect will be used for a single event. The given event will be stored in
+         * "originalEvent". But the event that corresponds to rectangle the rectangle instance will
+         * be stored in "event".
+         *
+         * @param event         Represents the event which this instance of rectangle represents.
+         * @param originalEvent The original event that was passed by the user.
+         * @param rectF         The rectangle.
+         */
+        EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
+            this.event = event;
+            this.rectF = rectF;
+            this.originalEvent = originalEvent;
+        }
+    }
+    // endregion
 }
