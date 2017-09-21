@@ -76,16 +76,20 @@ public class WeekView extends View {
     private PointF mCurrentOrigin = new PointF(0f, 0f);
     private ScaleGestureDetector mScaleDetector;
 
+    // Text.
     private int mBlackTextColor = Color.rgb(81, 91, 94);
     private int mGrayTextColor = Color.rgb(160, 168, 170);
     private int mRedTextColor = Color.rgb(255, 67, 55);
-
     private int mTextSize = 0;
+
+    // Background.
     private Paint mBackgroundPaint;
 
+    // Grid.
     private int mGridColor = Color.rgb(232, 235, 237);
     private int mGridThickness = 0;
 
+    // Days.
     private float mWidthPerDay;
     private int mDayHeight = 0;
     private int mFirstDayOfWeek = Calendar.MONDAY;
@@ -96,11 +100,13 @@ public class WeekView extends View {
     private float mHeaderMarginBottom;
     private int mHeaderRowPadding = 0;
 
+    // All Day.
     private int mAllDayEventHeight = 0;
     private Paint mAllDayBackgroundPaint;
     private Paint mAllDayTextPaint;
     private String mAllDayText;
 
+    // Time.
     private float mTimeColumnWidth;
     private float mTimeTextHeight;
     private int mEffectiveMinHourHeight = 0;
@@ -113,10 +119,12 @@ public class WeekView extends View {
     private Paint mHourPaint;
     private Paint mPeriodPaint;
 
+    // Now.
     private int mNowLineColor = Color.rgb(81, 91, 94);
     private int mNowLineThickness = 0;
     private Paint mNowLinePaint;
 
+    // Events.
     private int mEventCornerRadius = 0;
     private int mEventMargin = 0;
     private int mEventPadding = 0;
@@ -126,12 +134,12 @@ public class WeekView extends View {
     private TextPaint mEventTextPaint;
 
     // Listeners.
+    private DateTimeInterpreter mDateTimeInterpreter;
+    private EmptyViewClickListener mEmptyViewClickListener;
+    private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
     private WeekViewLoader mWeekViewLoader;
-    private EmptyViewClickListener mEmptyViewClickListener;
-    private EmptyViewLongPressListener mEmptyViewLongPressListener;
-    private DateTimeInterpreter mDateTimeInterpreter;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
@@ -325,45 +333,6 @@ public class WeekView extends View {
     }
 
     private void init() {
-        // Scrolling initialization.
-        mGestureDetector = new GestureDetectorCompat(mContext, mGestureListener);
-        mScroller = new OverScroller(mContext, new FastOutLinearInInterpolator());
-
-        mMinimumFlingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
-        mScaledTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
-
-        // 'All day' column.
-        mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mAllDayTextPaint.setTextAlign(Paint.Align.CENTER);
-        mAllDayTextPaint.setTextSize(mTextSize);
-        mAllDayTextPaint.setColor(mGrayTextColor);
-        mTimeColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mTimeColumnPadding * 2;
-
-        mAllDayBackgroundPaint = new Paint();
-        mAllDayBackgroundPaint.setColor(Color.rgb(247, 248, 248));
-
-        // Time column.
-        mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHourPaint.setTextAlign(Paint.Align.LEFT);
-        mHourPaint.setTextSize(mTextSize);
-        mHourPaint.setColor(mBlackTextColor);
-        Rect rect = new Rect();
-        mHourPaint.getTextBounds(TIME_TEXT, 0, TIME_TEXT.length(), rect);
-        mTimeTextHeight = rect.height();
-        mHeaderMarginBottom = mTimeTextHeight / 2; //TODO
-
-        mPeriodPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPeriodPaint.setTextAlign(Paint.Align.LEFT);
-        mPeriodPaint.setTextSize(mTextSize);
-        mPeriodPaint.setColor(mGrayTextColor);
-
-        // Measure settings for header row.
-        mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHeaderTextPaint.setColor(mBlackTextColor);
-        mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        mHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
-
         // Background.
         mBackgroundPaint = new Paint();
         mBackgroundPaint.setColor(Color.WHITE);
@@ -374,7 +343,40 @@ public class WeekView extends View {
         mGridPaint.setStrokeWidth(mGridThickness);
         mGridPaint.setColor(mGridColor);
 
-        // Now line.
+        // Days.
+        mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHeaderTextPaint.setColor(mBlackTextColor);
+        mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
+        mHeaderTextPaint.setTextSize(mTextSize);
+        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        // All Day.
+        mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mAllDayTextPaint.setTextAlign(Paint.Align.CENTER);
+        mAllDayTextPaint.setTextSize(mTextSize);
+        mAllDayTextPaint.setColor(mGrayTextColor);
+
+        mAllDayBackgroundPaint = new Paint();
+        mAllDayBackgroundPaint.setColor(Color.rgb(247, 248, 248));
+
+        // Time.
+        mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHourPaint.setTextAlign(Paint.Align.LEFT);
+        mHourPaint.setTextSize(mTextSize);
+        mHourPaint.setColor(mBlackTextColor);
+        Rect rect = new Rect();
+        mHourPaint.getTextBounds(TIME_TEXT, 0, TIME_TEXT.length(), rect);
+
+        mPeriodPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPeriodPaint.setTextAlign(Paint.Align.LEFT);
+        mPeriodPaint.setTextSize(mTextSize);
+        mPeriodPaint.setColor(mGrayTextColor);
+
+        mTimeColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mTimeColumnPadding * 2;
+        mTimeTextHeight = rect.height();
+        mHeaderMarginBottom = mTimeTextHeight / 2; //TODO
+
+        // Now.
         mNowLinePaint = new Paint();
         mNowLinePaint.setStrokeWidth(mNowLineThickness);
         mNowLinePaint.setColor(mNowLineColor);
@@ -388,6 +390,13 @@ public class WeekView extends View {
         mEventTextPaint.setColor(Color.WHITE);
         mEventTextPaint.setTextSize(mEventTextSize);
 
+        // Scrolling.
+        mGestureDetector = new GestureDetectorCompat(mContext, mGestureListener);
+        mScroller = new OverScroller(mContext, new FastOutLinearInInterpolator());
+
+        // Scale.
+        mMinimumFlingVelocity = ViewConfiguration.get(mContext).getScaledMinimumFlingVelocity();
+        mScaledTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
             @Override
             public void onScaleEnd(ScaleGestureDetector detector) {
