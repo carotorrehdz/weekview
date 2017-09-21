@@ -24,7 +24,9 @@
         app:minHourHeight="40dp"
         app:maxHourHeight="60dp"
 
-        app:gridWidth="2dp"
+        app:gridThickness="2dp"
+
+        app:nowLineThickness="0.5dp"
 
         app:eventCornerRadius="2dp"
         app:eventMargin="2dp"

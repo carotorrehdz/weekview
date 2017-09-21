@@ -20,8 +20,8 @@
         <attr name="columnGap" format="dimension"/>
 
         <attr name="noOfVisibleDays" format="integer"/>
-        <attr name="dayBackgroundColor" format="color"/>
-        <attr name="gridWidth" format="dimension"/>
+
+        <attr name="gridThickness" format="dimension"/>
         <attr name="eventTextColor" format="color"/>
         <attr name="eventPadding" format="dimension"/>
         <attr name="dayNameLength" format="enum">
@@ -36,8 +36,7 @@
         <attr name="pastBackgroundColor" format="color"/>
         <attr name="futureWeekendBackgroundColor" format="color"/>
         <attr name="pastWeekendBackgroundColor" format="color"/>
-        <attr name="showNowLine" format="boolean"/>
-        <attr name="nowLineColor" format="color"/>
+
         <attr name="nowLineThickness" format="dimension"/>
         <attr name="horizontalFlingEnabled" format="boolean"/>
         <attr name="verticalFlingEnabled" format="boolean"/>

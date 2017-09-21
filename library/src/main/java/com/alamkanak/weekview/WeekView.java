@@ -92,46 +92,44 @@ public class WeekView extends View {
     private int mGrayTextColor = Color.rgb(160, 168, 170);
     private int mRedTextColor = Color.rgb(255, 67, 55);
 
+    private float mWidthPerDay;
+    private int mDayHeight = 0;
     private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mNumberOfVisibleDays = 7;
-    private int mDayHeight;
-    private float mWidthPerDay;
 
     private int mGridColor = Color.rgb(232, 235, 237);
-    private int mGridWidth = 2;
+    private int mGridThickness = 0;
 
-    private int mAllDayEventHeight = 100;
+    private int mAllDayEventHeight = 0;
+    private Paint mAllDayBackgroundPaint;
     private Paint mAllDayTextPaint;
     private String mAllDayText;
-    private Paint mAllDayBackgroundPaint;
 
     private float mTimeColumnWidth;
     private int mTimeColumnPadding = 0;
 
     private float mTimeTextHeight;
-    private int mHourHeight = 60;
-    private int mNewHourHeight = -1;
-    private int mMaxHourHeight = 250;
+    private int mHourHeight = 0;
+    private int mMaxHourHeight = 0;
     private int mMinHourHeight = 0;
     private int mEffectiveMinHourHeight = mMinHourHeight; // Compensates for the fact that you can't keep zooming out.
+    private int mNewHourHeight = -1;
     private Paint mHourPaint;
-    private Paint mPeriodPaint;
     private Paint mHourSeparatorPaint;
+    private Paint mPeriodPaint;
 
     private int mTextSize = 14;
 
     private float mHeaderHeight;
     private Paint mHeaderTextPaint;
     private float mHeaderMarginBottom;
-
     private int mHeaderRowPadding = 10;
 
-    private int mDayBackgroundColor = Color.WHITE;
-    private Paint mDayBackgroundPaint;
+    private Paint mBackgroundPaint;
 
-    private int mNowLineColor = Color.rgb(102, 102, 102);
-    private int mNowLineThickness = 5;
     private boolean mShowNowLine = true;
+    private int mNowLineColor = Color.rgb(81, 91, 94);
+    private int mNowLineThickness = 0;
     private Paint mNowLinePaint;
 
     private int mEventTextSize = 12;
@@ -334,7 +332,7 @@ public class WeekView extends View {
             mMinHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, mMinHourHeight);
             mEffectiveMinHourHeight = mMinHourHeight;
 
-            mGridWidth = a.getDimensionPixelSize(R.styleable.WeekView_gridWidth, mGridWidth);
+            mGridThickness = a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness);
 
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
 
@@ -342,10 +340,6 @@ public class WeekView extends View {
 
             mTimeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, mTimeColumnPadding);
 
-            mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
-
-            mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
-            mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
 
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
@@ -405,13 +399,13 @@ public class WeekView extends View {
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // Prepare day background color paint.
-        mDayBackgroundPaint = new Paint();
-        mDayBackgroundPaint.setColor(mDayBackgroundColor);
+        mBackgroundPaint = new Paint();
+        mBackgroundPaint.setColor(Color.WHITE);
 
         // Prepare hour separator color paint.
         mHourSeparatorPaint = new Paint();
         mHourSeparatorPaint.setStyle(Paint.Style.STROKE);
-        mHourSeparatorPaint.setStrokeWidth(mGridWidth);
+        mHourSeparatorPaint.setStrokeWidth(mGridThickness);
         mHourSeparatorPaint.setColor(mGridColor);
 
         // Prepare the "now" line color paint
@@ -492,7 +486,7 @@ public class WeekView extends View {
         }
 
         // Draw right line.
-        canvas.drawLine(mTimeColumnWidth - mGridWidth / 2, 0, mTimeColumnWidth - mGridWidth / 2, getHeight(), mHourSeparatorPaint);
+        canvas.drawLine(mTimeColumnWidth - mGridThickness / 2, 0, mTimeColumnWidth - mGridThickness / 2, getHeight(), mHourSeparatorPaint);
     }
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
@@ -500,7 +494,7 @@ public class WeekView extends View {
         mWidthPerDay = getWidth() - mTimeColumnWidth;
         mWidthPerDay = mWidthPerDay / mNumberOfVisibleDays;
 
-        mHeaderHeight = mDayHeight + mAllDayEventHeight + mGridWidth * 2;
+        mHeaderHeight = mDayHeight + mAllDayEventHeight + mGridThickness * 2;
 
         Calendar today = today();
 
@@ -609,8 +603,8 @@ public class WeekView extends View {
             float start = (startPixel < mTimeColumnWidth ? mTimeColumnWidth : startPixel);
 
             if (mWidthPerDay + startPixel - start > 0) {
-                canvas.drawRect(start, mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), mDayBackgroundPaint);
-                canvas.drawLine(startPixel + mWidthPerDay - mGridWidth / 2, 0, startPixel + mWidthPerDay - mGridWidth / 2, getHeight(), mHourSeparatorPaint);
+                canvas.drawRect(start, mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), mBackgroundPaint);
+                canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, 0, startPixel + mWidthPerDay - mGridThickness / 2, getHeight(), mHourSeparatorPaint);
             }
 
             // Prepare the separator lines for hours.
@@ -650,17 +644,17 @@ public class WeekView extends View {
         canvas.clipRect(0, 0, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
         canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mAllDayBackgroundPaint);
         canvas.drawText(mAllDayText, mTimeColumnWidth / 2, mHeaderHeight + mHeaderRowPadding + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
-        canvas.drawLine(mTimeColumnWidth - mGridWidth / 2, 0, mTimeColumnWidth - mGridWidth / 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mTimeColumnWidth, mDayHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mHourSeparatorPaint);
+        canvas.drawLine(mTimeColumnWidth - mGridThickness / 2, 0, mTimeColumnWidth - mGridThickness / 2, mHeaderHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mTimeColumnWidth, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mHourSeparatorPaint);
 
         // Clip to paint header row only.
         canvas.clipRect(mTimeColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
 
         // Draw 'All day' background.
         canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mAllDayBackgroundPaint);
-        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridWidth / 2, getWidth(), mDayHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mHourSeparatorPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridWidth / 2, getWidth() - mGridWidth / 2, mHeaderHeight + mHeaderRowPadding * 2 - mGridWidth / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, getWidth(), mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mHourSeparatorPaint);
+        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, getWidth() - mGridThickness / 2, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mHourSeparatorPaint);
 
         // Draw the header row texts.
         startPixel = startFromPixel;
@@ -678,8 +672,8 @@ public class WeekView extends View {
             }
 
             canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mDayHeight + mHeaderRowPadding, mHeaderTextPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mGridWidth / 2, 0, startPixel + mWidthPerDay - mGridWidth / 2, mDayHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mGridWidth / 2, mDayHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay - mGridWidth / 2, getHeight(), mHourSeparatorPaint);
+            canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, 0, startPixel + mWidthPerDay - mGridThickness / 2, mDayHeight + mHeaderRowPadding * 2, mHourSeparatorPaint);
+            canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, mDayHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay - mGridThickness / 2, getHeight(), mHourSeparatorPaint);
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay;
         }
@@ -1408,16 +1402,6 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getDayBackgroundColor() {
-        return mDayBackgroundColor;
-    }
-
-    public void setDayBackgroundColor(int dayBackgroundColor) {
-        mDayBackgroundColor = dayBackgroundColor;
-        mDayBackgroundPaint.setColor(mDayBackgroundColor);
-        invalidate();
-    }
-
     public int getHourSeparatorColor() {
         return mGridColor;
     }
@@ -1425,16 +1409,6 @@ public class WeekView extends View {
     public void setHourSeparatorColor(int hourSeparatorColor) {
         mGridColor = hourSeparatorColor;
         mHourSeparatorPaint.setColor(mGridColor);
-        invalidate();
-    }
-
-    public int getHourSeparatorHeight() {
-        return mGridWidth;
-    }
-
-    public void setHourSeparatorHeight(int hourSeparatorHeight) {
-        mGridWidth = hourSeparatorHeight;
-        mHourSeparatorPaint.setStrokeWidth(mGridWidth);
         invalidate();
     }
 
@@ -1572,25 +1546,6 @@ public class WeekView extends View {
      */
     public void setShowNowLine(boolean showNowLine) {
         this.mShowNowLine = showNowLine;
-        invalidate();
-    }
-
-    /**
-     * Get the "now" line color.
-     *
-     * @return The color of the "now" line.
-     */
-    public int getNowLineColor() {
-        return mNowLineColor;
-    }
-
-    /**
-     * Set the "now" line color.
-     *
-     * @param nowLineColor The color of the "now" line.
-     */
-    public void setNowLineColor(int nowLineColor) {
-        this.mNowLineColor = nowLineColor;
         invalidate();
     }
 
