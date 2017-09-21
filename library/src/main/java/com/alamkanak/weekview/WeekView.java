@@ -76,13 +76,16 @@ public class WeekView extends View {
     private int mMinimumFlingVelocity = 0;
     private int mScaledTouchSlop = 0;
 
+    private int mBlackTextColor = Color.rgb(81, 91, 94);
+    private int mGrayTextColor = Color.rgb(160, 168, 170);
+    private int mRedTextColor = Color.rgb(255, 67, 55);
+
     private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mNumberOfVisibleDays = 7;
     private int mDayHeight;
     private float mWidthPerDay;
 
     private int mAllDayEventHeight = 100;
-    private int mAllDayTextColor = Color.rgb(160, 168, 170);
     private Paint mAllDayTextPaint;
     private String mAllDayText;
 
@@ -107,7 +110,6 @@ public class WeekView extends View {
 
     private float mHeaderColumnWidth;
     private int mHeaderColumnPadding = 10;
-    private int mHeaderColumnTextColor = Color.BLACK;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
     private Paint mHeaderColumnBackgroundPaint;
 
@@ -121,11 +123,6 @@ public class WeekView extends View {
     private int mNowLineThickness = 5;
     private boolean mShowNowLine = true;
     private Paint mNowLinePaint;
-
-    private int mTodayBackgroundColor = Color.WHITE;
-    private int mTodayHeaderTextColor = Color.BLACK;
-    private Paint mTodayBackgroundPaint;
-    private Paint mTodayHeaderTextPaint;
 
     private int mEventTextSize = 12;
     private int mEventTextColor = Color.BLACK;
@@ -342,23 +339,17 @@ public class WeekView extends View {
 
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
 
-//            mColumnGap = a.getDimensionPixelSize(R.styleable.WeekView_columnGap, mColumnGap);
-
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mHeaderRowBackgroundColor = a.getColor(R.styleable.WeekView_headerRowBackgroundColor, mHeaderRowBackgroundColor);
 
             mHeaderColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerColumnPadding, mHeaderColumnPadding);
             mHeaderColumnBackgroundColor = a.getColor(R.styleable.WeekView_headerColumnBackground, mHeaderColumnBackgroundColor);
-            mHeaderColumnTextColor = a.getColor(R.styleable.WeekView_headerColumnTextColor, mHeaderColumnTextColor);
 
             mDayBackgroundColor = a.getColor(R.styleable.WeekView_dayBackgroundColor, mDayBackgroundColor);
 
             mShowNowLine = a.getBoolean(R.styleable.WeekView_showNowLine, mShowNowLine);
             mNowLineColor = a.getColor(R.styleable.WeekView_nowLineColor, mNowLineColor);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
-
-            mTodayBackgroundColor = a.getColor(R.styleable.WeekView_todayBackgroundColor, mTodayBackgroundColor);
-            mTodayHeaderTextColor = a.getColor(R.styleable.WeekView_todayHeaderTextColor, mTodayHeaderTextColor);
 
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
             mEventTextColor = a.getColor(R.styleable.WeekView_eventTextColor, mEventTextColor);
@@ -388,14 +379,14 @@ public class WeekView extends View {
         mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mAllDayTextPaint.setTextAlign(Paint.Align.CENTER);
         mAllDayTextPaint.setTextSize(mTextSize);
-        mAllDayTextPaint.setColor(mAllDayTextColor);
+        mAllDayTextPaint.setColor(mGrayTextColor);
         mHeaderColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mHeaderColumnPadding * 2;
 
         // Measure settings for time column.
         mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHourPaint.setTextAlign(Paint.Align.LEFT);
         mHourPaint.setTextSize(mTextSize);
-        mHourPaint.setColor(Color.rgb(81, 91, 94));
+        mHourPaint.setColor(mBlackTextColor);
         Rect rect = new Rect();
         mHourPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mTimeTextHeight = rect.height();
@@ -404,14 +395,13 @@ public class WeekView extends View {
         mPeriodPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPeriodPaint.setTextAlign(Paint.Align.LEFT);
         mPeriodPaint.setTextSize(mTextSize);
-        mPeriodPaint.setColor(Color.rgb(160, 169, 170));
+        mPeriodPaint.setColor(mGrayTextColor);
 
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHeaderTextPaint.setColor(mHeaderColumnTextColor);
+        mHeaderTextPaint.setColor(mBlackTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.getTextBounds("00 PM", 0, "00 PM".length(), rect);
         mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // Prepare header background paint.
@@ -432,17 +422,6 @@ public class WeekView extends View {
         mNowLinePaint = new Paint();
         mNowLinePaint.setStrokeWidth(mNowLineThickness);
         mNowLinePaint.setColor(mNowLineColor);
-
-        // Prepare today background color paint.
-        mTodayBackgroundPaint = new Paint();
-        mTodayBackgroundPaint.setColor(mTodayBackgroundColor);
-
-        // Prepare today header text color paint.
-        mTodayHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTodayHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
-        mTodayHeaderTextPaint.setTextSize(mTextSize);
-        mTodayHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
 
         // Prepare event background color.
         mEventBackgroundPaint = new Paint();
@@ -1415,7 +1394,6 @@ public class WeekView extends View {
 
     public void setTextSize(int textSize) {
         mTextSize = textSize;
-        mTodayHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.setTextSize(mTextSize);
         invalidate();
     }
@@ -1426,16 +1404,6 @@ public class WeekView extends View {
 
     public void setHeaderColumnPadding(int headerColumnPadding) {
         mHeaderColumnPadding = headerColumnPadding;
-        invalidate();
-    }
-
-    public int getHeaderColumnTextColor() {
-        return mHeaderColumnTextColor;
-    }
-
-    public void setHeaderColumnTextColor(int headerColumnTextColor) {
-        mHeaderColumnTextColor = headerColumnTextColor;
-        mHeaderTextPaint.setColor(mHeaderColumnTextColor);
         invalidate();
     }
 
@@ -1478,16 +1446,6 @@ public class WeekView extends View {
         invalidate();
     }
 
-    public int getTodayBackgroundColor() {
-        return mTodayBackgroundColor;
-    }
-
-    public void setTodayBackgroundColor(int todayBackgroundColor) {
-        mTodayBackgroundColor = todayBackgroundColor;
-        mTodayBackgroundPaint.setColor(mTodayBackgroundColor);
-        invalidate();
-    }
-
     public int getHourSeparatorHeight() {
         return mHourSeparatorLineWidth;
     }
@@ -1495,16 +1453,6 @@ public class WeekView extends View {
     public void setHourSeparatorHeight(int hourSeparatorHeight) {
         mHourSeparatorLineWidth = hourSeparatorHeight;
         mHourSeparatorPaint.setStrokeWidth(mHourSeparatorLineWidth);
-        invalidate();
-    }
-
-    public int getTodayHeaderTextColor() {
-        return mTodayHeaderTextColor;
-    }
-
-    public void setTodayHeaderTextColor(int todayHeaderTextColor) {
-        mTodayHeaderTextColor = todayHeaderTextColor;
-        mTodayHeaderTextPaint.setColor(mTodayHeaderTextColor);
         invalidate();
     }
 

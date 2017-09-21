@@ -17,7 +17,6 @@
         app:allDayText="@string/all_day"
 
         app:headerColumnPadding="8dp"
-        app:headerColumnTextColor="@color/toolbar_text"
 
         app:headerRowPadding="20dp"
 

@@ -18,13 +18,11 @@
         <attr name="headerColumnPadding" format="dimension"/>
         <attr name="headerRowPadding" format="dimension"/>
         <attr name="columnGap" format="dimension"/>
-        <attr name="headerColumnTextColor" format="color"/>
+
         <attr name="noOfVisibleDays" format="integer"/>
         <attr name="headerRowBackgroundColor" format="color"/>
         <attr name="dayBackgroundColor" format="color"/>
         <attr name="hourSeparatorColor" format="color"/>
-        <attr name="todayBackgroundColor" format="color"/>
-        <attr name="todayHeaderTextColor" format="color"/>
         <attr name="hourSeparatorLineWidth" format="dimension"/>
         <attr name="eventTextColor" format="color"/>
         <attr name="eventPadding" format="dimension"/>
