@@ -463,10 +463,10 @@ public class WeekView extends View {
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
         // Calculate the available width for each day.
-        mWidthPerDay = getWidth() - mTimeColumnWidth;
-        mWidthPerDay = mWidthPerDay / mNumberOfVisibleDays;
+        mWidthPerDay = (getWidth() - mTimeColumnWidth) / mNumberOfVisibleDays;
 
-        mHeaderHeight = mDayHeight + mAllDayEventHeight + mGridThickness * 2;
+        // Calculate header height.
+        mHeaderHeight = mDayHeight + mAllDayEventHeight;
 
         Calendar today = today();
 
@@ -494,8 +494,7 @@ public class WeekView extends View {
 
             // If the week view is being drawn for the first time, then consider the first day of the week.
             if (today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
-                int difference = (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
-                mCurrentOrigin.x += mWidthPerDay * difference;
+                mCurrentOrigin.x += mWidthPerDay * (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
             }
         }
 
@@ -561,9 +560,7 @@ public class WeekView extends View {
             boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. GeT events only when it is the first iteration of the loop.
-            if (mEventRects == null || mRefreshEvents ||
-                    (dayNumber == leftDaysWithGaps + 1 && mFetchedPeriod != (int) mWeekViewLoader.toWeekViewPeriodIndex(day) &&
-                            Math.abs(mFetchedPeriod - mWeekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
+            if (mEventRects == null || mRefreshEvents || (dayNumber == leftDaysWithGaps + 1 && mFetchedPeriod != (int) mWeekViewLoader.toWeekViewPeriodIndex(day) && Math.abs(mFetchedPeriod - mWeekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
                 getMoreEvents(day);
                 mRefreshEvents = false;
             }
