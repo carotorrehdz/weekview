@@ -646,10 +646,15 @@ public class WeekView extends View {
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
             }
 
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mDayHeight + mHeaderRowPadding, mHeaderTextPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, 0, startPixel + mWidthPerDay - mGridThickness / 2, mDayHeight + mHeaderRowPadding * 2, mGridPaint);
-            canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, mDayHeight + mHeaderRowPadding * 2, startPixel + mWidthPerDay - mGridThickness / 2, getHeight(), mGridPaint);
+            // Draw day text.
+            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mDayHeight / 2 + mHeaderTextPaint.getTextSize() / 2, mHeaderTextPaint);
+
+            // Day right line.
+            canvas.drawLine(startPixel + mWidthPerDay - mGridRadio, 0, startPixel + mWidthPerDay - mGridRadio, mHeaderHeight, mGridPaint);
+
+            // Draw 'All day' events.
             drawAllDayEvents(day, startPixel, canvas);
+
             startPixel += mWidthPerDay;
         }
     }
