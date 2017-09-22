@@ -438,7 +438,6 @@ public class WeekView extends View {
     private void drawTimeColumnAndAxes(Canvas canvas) {
         // Clip to paint in left column only.
         canvas.clipRect(0, mHeaderHeight, mTimeColumnWidth, getHeight(), Region.Op.REPLACE);
-        canvas.drawRect(0, mHeaderHeight, mTimeColumnWidth, getHeight(), mAllDayBackgroundPaint);
 
         for (int i = 0; i < HOURS; i++) {
             float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
@@ -607,20 +606,30 @@ public class WeekView extends View {
         }
 
         // Draw 'All day' text.
-        canvas.clipRect(0, 0, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
-        canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2, mAllDayBackgroundPaint);
-        canvas.drawText(mAllDayText, mTimeColumnWidth / 2, mHeaderHeight + mHeaderRowPadding + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
-        canvas.drawLine(mTimeColumnWidth - mGridThickness / 2, 0, mTimeColumnWidth - mGridThickness / 2, mHeaderHeight + mHeaderRowPadding * 2, mGridPaint);
-        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mTimeColumnWidth, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mGridPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mGridPaint);
+        canvas.clipRect(0, 0, mTimeColumnWidth, mHeaderHeight, Region.Op.REPLACE);
+        canvas.drawRect(0, mDayHeight, mTimeColumnWidth, mHeaderHeight, mAllDayBackgroundPaint);
+        canvas.drawText(mAllDayText, mTimeColumnWidth / 2, mHeaderHeight - mTimeColumnPadding, mAllDayTextPaint);
+
+        // 'All day' text left line.
+        canvas.drawLine(mTimeColumnWidth - mGridRadio, 0, mTimeColumnWidth - mGridRadio, mHeaderHeight, mGridPaint);
+
+        // 'All day' text top line.
+        canvas.drawLine(0, mDayHeight + mGridRadio, mTimeColumnWidth, mDayHeight + mGridRadio, mGridPaint);
+
+        // 'All day' text bottom line.
+        canvas.drawLine(0, mHeaderHeight - mGridRadio, mTimeColumnWidth, mHeaderHeight - mGridRadio, mGridPaint);
 
         // Clip to paint header row only.
-        canvas.clipRect(mTimeColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
+        canvas.clipRect(mTimeColumnWidth, 0, getWidth(), mHeaderHeight, Region.Op.REPLACE);
 
         // Draw 'All day' background.
-        canvas.drawRect(0, mDayHeight + mHeaderRowPadding * 2, getWidth(), getHeight(), mAllDayBackgroundPaint);
-        canvas.drawLine(0, mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, getWidth(), mDayHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mGridPaint);
-        canvas.drawLine(0, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, getWidth() - mGridThickness / 2, mHeaderHeight + mHeaderRowPadding * 2 - mGridThickness / 2, mGridPaint);
+        canvas.drawRect(0, mDayHeight, getWidth(), getHeight(), mAllDayBackgroundPaint);
+
+        // 'All day' background top line.
+        canvas.drawLine(0, mDayHeight + mGridRadio, getWidth(), mDayHeight + mGridRadio, mGridPaint);
+
+        // 'All day' background bottom line.
+        canvas.drawLine(0, mHeaderHeight - mGridRadio, getWidth(), mHeaderHeight - mGridRadio, mGridPaint);
 
         // Draw the header row texts.
         startPixel = startFromPixel;
