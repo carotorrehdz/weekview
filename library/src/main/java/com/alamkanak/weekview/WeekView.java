@@ -608,7 +608,7 @@ public class WeekView extends View {
         // Draw 'All day' text.
         canvas.clipRect(0, 0, mTimeColumnWidth, mHeaderHeight, Region.Op.REPLACE);
         canvas.drawRect(0, mDayHeight, mTimeColumnWidth, mHeaderHeight, mAllDayBackgroundPaint);
-        canvas.drawText(mAllDayText, mTimeColumnWidth / 2, mHeaderHeight - mTimeColumnPadding, mAllDayTextPaint);
+        canvas.drawText(mAllDayText, mTimeColumnWidth / 2, mDayHeight - mGridThickness + mAllDayEventHeight / 2 + mAllDayTextPaint.getTextSize() / 2, mAllDayTextPaint);
 
         // 'All day' text left line.
         canvas.drawLine(mTimeColumnWidth - mGridRadio, 0, mTimeColumnWidth - mGridRadio, mHeaderHeight, mGridPaint);
