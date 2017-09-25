@@ -87,8 +87,8 @@ public class WeekView extends View {
     private Paint mBackgroundPaint;
 
     // Grid.
+    private float mGridRadio = 0;
     private int mGridColor = Color.rgb(232, 235, 237);
-    private int mGridRadio = 0;
     private int mGridThickness = 0;
 
     // Days.
@@ -104,6 +104,7 @@ public class WeekView extends View {
 
     // All Day.
     private int mAllDayEventHeight = 0;
+    private int mAllDayEventPadding = 0;
     private Paint mAllDayBackgroundPaint;
     private Paint mAllDayTextPaint;
     private String mAllDayText;
@@ -308,7 +309,7 @@ public class WeekView extends View {
 
         try {
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
-            mGridThickness = a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness);
+            mGridThickness = Math.round(a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness) / 2) * 2;
             mGridRadio = mGridThickness / 2;
             mDayHeight = a.getDimensionPixelSize(R.styleable.WeekView_dayHeight, mDayHeight);
             mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
@@ -316,6 +317,7 @@ public class WeekView extends View {
             // TODO
             mHeaderRowPadding = a.getDimensionPixelSize(R.styleable.WeekView_headerRowPadding, mHeaderRowPadding);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
+            mAllDayEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventPadding, mAllDayEventPadding);
             mAllDayText = a.getString(R.styleable.WeekView_allDayText);
             mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
             mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
@@ -542,7 +544,7 @@ public class WeekView extends View {
         }
 
         // Clip to paint events only.
-        canvas.clipRect(mTimeColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvas.clipRect(mTimeColumnWidth, mHeaderHeight, getWidth(), getHeight(), Region.Op.REPLACE);
 
         // Iterate through each day.
         Calendar mFirstVisibleDay = (Calendar) today.clone();
@@ -746,7 +748,7 @@ public class WeekView extends View {
     }
 
     /**
-     * Draw all the Allday-events of a particular day.
+     * Draw all the All day-events of a particular day.
      *
      * @param date           The day.
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
@@ -757,7 +759,7 @@ public class WeekView extends View {
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && mEventRects.get(i).event.isAllDay()) {
                     // Calculate top.
-                    float top = mHeaderRowPadding * 2 + mHeaderMarginBottom + +mTimeTextHeight / 2 + mEventMargin;
+                    float top = mDayHeight + mGridThickness + mEventMargin;
 
                     // Calculate bottom.
                     float bottom = top + mEventRects.get(i).bottom;
@@ -767,21 +769,20 @@ public class WeekView extends View {
 
                     if (left < startFromPixel) {
                         left += mOverlappingEventGap;
+                    } else {
+                        left += mEventMargin;
                     }
 
-                    float right = left + mEventRects.get(i).width * mWidthPerDay;
+                    float right = left + mEventRects.get(i).width * mWidthPerDay - mGridThickness;
 
                     if (right < startFromPixel + mWidthPerDay) {
                         right -= mOverlappingEventGap;
+                    } else {
+                        right -= mEventMargin * 2;
                     }
 
                     // Draw the event and the event name on top of it.
-                    if (left < right &&
-                            left < getWidth() &&
-                            top < getHeight() &&
-                            right > mTimeColumnWidth &&
-                            bottom > 0
-                            ) {
+                    if (left < right && left < getWidth() && top < getHeight() && right > mTimeColumnWidth && bottom > 0) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? Color.WHITE : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
@@ -826,33 +827,46 @@ public class WeekView extends View {
             bob.append(event.getLocation());
         }
 
-        int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
-        int availableWidth = (int) (rect.right - originalLeft - mEventPadding * 2);
+        int padding = event.isAllDay() ? mAllDayEventPadding : mEventPadding;
+        int availableHeight = (int) (rect.bottom - originalTop - (event.isAllDay() ? 0 : padding * 2));
+        int availableWidth = (int) (rect.right - originalLeft - padding * 2);
 
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
-            // Calculate available number of line counts.
-            int availableLineCount = availableHeight / lineHeight;
-
-            do {
-                // Ellipsize text to fit into event rect.
-                textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
-
-                // Reduce line count.
-                availableLineCount--;
-
-                // Repeat until text is short enough.
-            } while (textLayout.getHeight() > availableHeight);
-
             // Draw text.
+            textLayout = getTruncatedEventTitle(rect, bob, availableHeight, availableWidth, lineHeight, padding, originalLeft, event.isAllDay());
             canvas.save();
-            canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
+            float translatedTop = event.isAllDay() ? (availableHeight - lineHeight) / 2 : padding;
+            canvas.translate(originalLeft + padding, originalTop + translatedTop);
             textLayout.draw(canvas);
             canvas.restore();
         }
+    }
+
+    private StaticLayout getTruncatedEventTitle(RectF rect, SpannableStringBuilder bob, int availableHeight, int availableWidth, int lineHeight, int padding, float originalLeft, boolean isAllDay) {
+        if (isAllDay) {
+            return new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - padding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+        }
+
+        StaticLayout textLayout;
+
+        // Calculate available number of line counts.
+        int availableLineCount = availableHeight / lineHeight;
+
+        do {
+            // Ellipsize text to fit into event rect.
+            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - padding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+
+            // Reduce line count.
+            availableLineCount--;
+
+            // Repeat until text is short enough.
+        } while (textLayout.getHeight() > availableHeight);
+
+        return textLayout;
     }
 
     // region Events methods
@@ -1109,7 +1123,7 @@ public class WeekView extends View {
                         eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
                     } else {
                         eventRect.top = 0;
-                        eventRect.bottom = mAllDayEventHeight;
+                        eventRect.bottom = mAllDayEventHeight - mGridThickness * 2 - mEventMargin * 2;
                     }
 
                     mEventRects.add(eventRect);
