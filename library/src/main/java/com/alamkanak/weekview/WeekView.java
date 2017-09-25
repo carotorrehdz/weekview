@@ -288,6 +288,7 @@ public class WeekView extends View {
         }
     };
 
+    // region Constructor
     public WeekView(Context context) {
         this(context, null);
     }
@@ -419,6 +420,7 @@ public class WeekView extends View {
             }
         });
     }
+    // endregion
 
     @Override
     protected void onDraw(Canvas canvas) {
