@@ -442,7 +442,7 @@ public class WeekView extends View {
         canvas.clipRect(0, mHeaderHeight, mTimeColumnWidth, getHeight(), Region.Op.REPLACE);
 
         for (int i = 0; i < HOURS; i++) {
-            float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * i + mHeaderMarginBottom;
+            float top = mHeaderHeight + mHourHeight + mCurrentOrigin.y + mHourHeight * i;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
             String hour = getDateTimeInterpreter().interpretTime(i + 1);
@@ -453,8 +453,8 @@ public class WeekView extends View {
             }
 
             if (top < getHeight()) {
-                canvas.drawText(hour, mTimeColumnPadding, top + mTimeTextHeight, mHourPaint);
-                canvas.drawText(period, mTimeColumnPadding, top + mTimeTextHeight + mTimeColumnPadding * 2, mPeriodPaint);
+                canvas.drawText(hour, mTimeColumnPadding, top + mTimeTextHeight / 2, mHourPaint);
+                canvas.drawText(period, mTimeColumnPadding, top + mTimeTextHeight / 2 + mTimeColumnPadding * 2, mPeriodPaint);
             }
         }
 
