@@ -472,7 +472,7 @@ public class WeekView extends View {
         Calendar today = today();
 
         if (mAreDimensionsInvalid) {
-            mEffectiveMinHourHeight = Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / HOURS));
+            mEffectiveMinHourHeight = Math.max(mMinHourHeight, (int) ((getHeight() - mHeaderHeight - mHourHeight) / HOURS));
             mAreDimensionsInvalid = false;
 
             if (mScrollToDay != null) {
@@ -513,8 +513,8 @@ public class WeekView extends View {
         }
 
         // If the new mCurrentOrigin.y is invalid, make it valid.
-        if (mCurrentOrigin.y < getHeight() - mHourHeight * HOURS - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom - mTimeTextHeight / 2) {
-            mCurrentOrigin.y = getHeight() - mHourHeight * HOURS - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom - mTimeTextHeight / 2;
+        if (mCurrentOrigin.y < getHeight() - mHourHeight * HOURS - mHeaderHeight - mHourHeight - mTimeTextHeight / 2) {
+            mCurrentOrigin.y = getHeight() - mHourHeight * HOURS - mHeaderHeight - mHourHeight - mTimeTextHeight / 2;
         }
 
         // Don't put an "else if" because it will trigger a glitch when completely zoomed out and scrolling vertically.
@@ -532,7 +532,7 @@ public class WeekView extends View {
         day.add(Calendar.HOUR, 6);
 
         // Prepare to iterate for each hour to draw the hour lines.
-        int lineCount = (int) ((getHeight() - mHeaderHeight - mHeaderRowPadding * 2 - mHeaderMarginBottom) / mHourHeight) + 1;
+        int lineCount = (int) ((getHeight() - mHeaderHeight - mHourHeight) / mHourHeight) + 1;
         lineCount = (lineCount) * (mNumberOfVisibleDays + 1);
         float[] hourLines = new float[lineCount * 4];
 
@@ -545,6 +545,7 @@ public class WeekView extends View {
 
         // Clip to paint events only.
         canvas.clipRect(mTimeColumnWidth, mHeaderHeight, getWidth(), getHeight(), Region.Op.REPLACE);
+        canvas.drawRect(mTimeColumnWidth, mHeaderHeight, getWidth(), getHeight(), mBackgroundPaint);
 
         // Iterate through each day.
         Calendar mFirstVisibleDay = (Calendar) today.clone();
@@ -570,17 +571,16 @@ public class WeekView extends View {
             float start = (startPixel < mTimeColumnWidth ? mTimeColumnWidth : startPixel);
 
             if (mWidthPerDay + startPixel - start > 0) {
-                canvas.drawRect(start, mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), mBackgroundPaint);
-                canvas.drawLine(startPixel + mWidthPerDay - mGridThickness / 2, 0, startPixel + mWidthPerDay - mGridThickness / 2, getHeight(), mGridPaint);
+                canvas.drawLine(startPixel + mWidthPerDay - mGridRadio, 0, startPixel + mWidthPerDay - mGridRadio, getHeight(), mGridPaint);
             }
 
             // Prepare the separator lines for hours.
             int i = 0;
 
-            for (int hourNumber = 0; hourNumber < HOURS; hourNumber++) {
-                float top = mHeaderHeight + mHeaderRowPadding * 2 + mCurrentOrigin.y + mHourHeight * hourNumber + mTimeTextHeight / 2 + mHeaderMarginBottom;
+            for (int hourNumber = 0; hourNumber <= HOURS; hourNumber++) {
+                float top = mHeaderHeight + mCurrentOrigin.y + mHourHeight * hourNumber;
 
-                if (top > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom && top < getHeight() && startPixel + mWidthPerDay - start > 0) {
+                if (top > mHeaderHeight + mTimeTextHeight / 2 && top < getHeight() && startPixel + mWidthPerDay - start > 0) {
                     hourLines[i * 4] = start;
                     hourLines[i * 4 + 1] = top;
                     hourLines[i * 4 + 2] = startPixel + mWidthPerDay;
@@ -597,7 +597,7 @@ public class WeekView extends View {
 
             // Draw the line at the current time.
             if (sameDay) {
-                float startY = mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom + mCurrentOrigin.y;
+                float startY = mHeaderHeight + mTimeTextHeight / 2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * mHourHeight;
                 canvas.drawLine(start, startY + beforeNow, startPixel + mWidthPerDay, startY + beforeNow, mNowLinePaint);
