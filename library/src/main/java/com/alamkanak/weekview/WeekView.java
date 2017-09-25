@@ -662,38 +662,6 @@ public class WeekView extends View {
     }
 
     /**
-     * Get the time and date where the user clicked on.
-     *
-     * @param x The x position of the touch event.
-     * @param y The y position of the touch event.
-     * @return The time and date at the clicked position.
-     */
-    private Calendar getTimeFromPoint(float x, float y) {
-        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / mWidthPerDay));
-        float startPixel = mCurrentOrigin.x + mWidthPerDay * leftDaysWithGaps + mTimeColumnWidth;
-
-        for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
-            float start = (startPixel < mTimeColumnWidth ? mTimeColumnWidth : startPixel);
-
-            if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay) {
-                Calendar day = today();
-                day.add(Calendar.DATE, dayNumber - 1);
-                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderHeight - mHeaderRowPadding * 2 - mTimeTextHeight / 2 - mHeaderMarginBottom;
-                int hour = (int) (pixelsFromZero / mHourHeight);
-                int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
-                day.add(Calendar.HOUR, hour);
-                day.set(Calendar.MINUTE, minute);
-
-                return day;
-            }
-
-            startPixel += mWidthPerDay;
-        }
-
-        return null;
-    }
-
-    /**
      * Draw all the events of a particular day.
      *
      * @param date           The day.
@@ -869,6 +837,37 @@ public class WeekView extends View {
         return textLayout;
     }
 
+    /**
+     * Get the time and date where the user clicked on.
+     *
+     * @param x The x position of the touch event.
+     * @param y The y position of the touch event.
+     * @return The time and date at the clicked position.
+     */
+    private Calendar getTimeFromPoint(float x, float y) {
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / mWidthPerDay));
+        float startPixel = mCurrentOrigin.x + mWidthPerDay * leftDaysWithGaps + mTimeColumnWidth;
+
+        for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
+            float start = (startPixel < mTimeColumnWidth ? mTimeColumnWidth : startPixel);
+
+            if (mWidthPerDay + startPixel - start > 0 && x > start && x < startPixel + mWidthPerDay) {
+                Calendar day = today();
+                day.add(Calendar.DATE, dayNumber - 1);
+                float pixelsFromZero = y - mCurrentOrigin.y - mHeaderHeight - mHeaderRowPadding * 2 - mTimeTextHeight / 2 - mHeaderMarginBottom;
+                int hour = (int) (pixelsFromZero / mHourHeight);
+                int minute = (int) (60 * (pixelsFromZero - hour * mHourHeight) / mHourHeight);
+                day.add(Calendar.HOUR, hour);
+                day.set(Calendar.MINUTE, minute);
+
+                return day;
+            }
+
+            startPixel += mWidthPerDay;
+        }
+
+        return null;
+    }
     // region Events methods
 
     /**
