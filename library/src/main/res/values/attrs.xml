@@ -14,7 +14,6 @@
             <enum name="saturday" value="7" />
         </attr>
         <attr name="noOfVisibleDays" format="integer" />
-        <attr name="headerRowPadding" format="dimension" />
         <attr name="allDayEventHeight" format="dimension" />
         <attr name="allDayEventPadding" format="dimension" />
         <attr name="allDayText" format="string" />

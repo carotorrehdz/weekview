@@ -19,7 +19,6 @@
         app:eventPadding="8dp"
         app:eventTextSize="10dp"
         app:gridThickness="1dp"
-        app:headerRowPadding="20dp"
         app:hourHeight="60dp"
         app:maxHourHeight="60dp"
         app:minHourHeight="40dp"
