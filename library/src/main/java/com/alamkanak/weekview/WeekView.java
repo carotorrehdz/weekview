@@ -215,10 +215,10 @@ public class WeekView extends View {
             switch (mCurrentFlingDirection) {
                 case LEFT:
                 case RIGHT:
-                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * HOURS + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - getHeight()), 0);
+                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, (int) (velocityX * mXScrollingSpeed), 0, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * HOURS + mHeaderHeight + mHourHeight + mTimeTextHeight / 2 - getHeight()), 0);
                     break;
                 case VERTICAL:
-                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * HOURS + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - getHeight()), 0);
+                    mScroller.fling((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, 0, (int) velocityY, Integer.MIN_VALUE, Integer.MAX_VALUE, (int) -(mHourHeight * HOURS + mHeaderHeight + mHourHeight + mTimeTextHeight / 2 - getHeight()), 0);
                     break;
             }
 
@@ -422,6 +422,7 @@ public class WeekView extends View {
     }
     // endregion
 
+    // region Draw methods
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -669,11 +670,11 @@ public class WeekView extends View {
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
                     // Calculate top.
-                    float top = mHourHeight * HOURS * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 + mEventMargin;
+                    float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mEventMargin;
 
                     // Calculate bottom.
                     float bottom = mEventRects.get(i).bottom;
-                    bottom = mHourHeight * HOURS * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2 - mEventMargin;
+                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight;
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
@@ -681,24 +682,19 @@ public class WeekView extends View {
                     if (left < startFromPixel) {
                         left += mOverlappingEventGap;
                     } else {
-                        left += mEventMargin * 0.5;
+                        left += mEventMargin;
                     }
 
-                    float right = left + mEventRects.get(i).width * mWidthPerDay;
+                    float right = left + mEventRects.get(i).width * mWidthPerDay - mGridThickness;
 
                     if (right < startFromPixel + mWidthPerDay) {
                         right -= mOverlappingEventGap;
                     } else {
-                        right -= mEventMargin * 1.5;
+                        right -= mEventMargin * 2;
                     }
 
                     // Draw the event and the event name on top of it.
-                    if (left < right &&
-                            left < getWidth() &&
-                            top < getHeight() &&
-                            right > mTimeColumnWidth &&
-                            bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
-                            ) {
+                    if (left < right && left < getWidth() && top < getHeight() && right > mTimeColumnWidth && bottom > mHeaderHeight) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? Color.WHITE : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
@@ -864,6 +860,8 @@ public class WeekView extends View {
 
         return null;
     }
+    // endregion
+
     // region Events methods
 
     /**
