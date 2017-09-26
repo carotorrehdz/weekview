@@ -673,8 +673,7 @@ public class WeekView extends View {
                     float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mEventMargin;
 
                     // Calculate bottom.
-                    float bottom = mEventRects.get(i).bottom;
-                    bottom = mHourHeight * 24 * bottom / 1440 + mCurrentOrigin.y + mHeaderHeight;
+                    float bottom = mHourHeight * 24 * mEventRects.get(i).bottom / 1440 + mCurrentOrigin.y + mHeaderHeight;
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
