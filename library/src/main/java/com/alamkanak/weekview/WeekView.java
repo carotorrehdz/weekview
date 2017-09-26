@@ -10,8 +10,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
@@ -126,6 +128,7 @@ public class WeekView extends View {
 
     // Events.
     private int mEventCornerRadius = 0;
+    private int mEventDrawableSize = 0;
     private int mEventMargin = 0;
     private int mEventPadding = 0;
     private int mEventTextSize = 0;
@@ -322,6 +325,7 @@ public class WeekView extends View {
             mTimeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, mTimeColumnPadding);
             mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
+            mEventDrawableSize = a.getDimensionPixelSize(R.styleable.WeekView_eventDrawableSize, mEventDrawableSize);
             mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
             mEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_eventPadding, mEventPadding);
             mEventTextSize = a.getDimensionPixelSize(R.styleable.WeekView_eventTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mEventTextSize, context.getResources().getDisplayMetrics()));
@@ -787,7 +791,7 @@ public class WeekView extends View {
         }
 
         int padding = event.isAllDay() ? mAllDayEventPadding : mEventPadding;
-        int availableHeight = (int) (rect.bottom - originalTop - (event.isAllDay() ? 0 : padding * 2));
+        int availableHeight = (int) (rect.bottom - originalTop);
         int availableWidth = (int) (rect.right - originalLeft - padding * 2);
 
         // Get text dimensions.
@@ -795,19 +799,42 @@ public class WeekView extends View {
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
 
         if (availableHeight >= lineHeight) {
-            // Draw text.
-            textLayout = getTruncatedEventTitle(rect, bob, availableHeight, availableWidth, lineHeight, padding, originalLeft, event.isAllDay());
+            // Calculate top.
+            float top = originalTop + (availableHeight - lineHeight) / 2;
+
+            // Calculate left.
+            float left = originalLeft + padding;
+
+            // Get drawable.
+            if (event.isAllDay() && event.hasDrawable()) {
+                Drawable drawable = ContextCompat.getDrawable(getContext(), event.getDrawableId());
+                drawable.setBounds((int) left, (int) top, (int) left + mEventDrawableSize, (int) (top + mEventDrawableSize));
+                drawable.draw(canvas);
+
+                // Calculate new left.
+                left = left + mEventDrawableSize + padding;
+
+                // Calculate new available width.
+                availableWidth = availableWidth - mEventDrawableSize - padding;
+            }
+
+            // Get text.
+            textLayout = getTruncatedEventTitle(bob, availableHeight, availableWidth, lineHeight, event.isAllDay());
+
+            if (textLayout.getLineCount() > 1) {
+                top = originalTop + (availableHeight - textLayout.getHeight()) / 2;
+            }
+
             canvas.save();
-            float translatedTop = event.isAllDay() ? (availableHeight - lineHeight) / 2 : padding;
-            canvas.translate(originalLeft + padding, originalTop + translatedTop);
+            canvas.translate(left, top);
             textLayout.draw(canvas);
             canvas.restore();
         }
     }
 
-    private StaticLayout getTruncatedEventTitle(RectF rect, SpannableStringBuilder bob, int availableHeight, int availableWidth, int lineHeight, int padding, float originalLeft, boolean isAllDay) {
+    private StaticLayout getTruncatedEventTitle(SpannableStringBuilder bob, int availableHeight, int availableWidth, int lineHeight, boolean isAllDay) {
         if (isAllDay) {
-            return new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - padding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+            return new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
         }
 
         StaticLayout textLayout;
@@ -817,7 +844,7 @@ public class WeekView extends View {
 
         do {
             // Ellipsize text to fit into event rect.
-            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - padding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+            textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
             // Reduce line count.
             availableLineCount--;

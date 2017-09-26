@@ -23,6 +23,7 @@
         <attr name="timeColumnPadding" format="dimension" />
         <attr name="nowLineThickness" format="dimension" />
         <attr name="eventCornerRadius" format="dimension" />
+        <attr name="eventDrawableSize" format="dimension" />
         <attr name="eventMargin" format="dimension" />
         <attr name="eventPadding" format="dimension" />
         <attr name="eventTextSize" format="dimension" />
