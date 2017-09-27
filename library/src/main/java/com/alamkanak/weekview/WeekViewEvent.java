@@ -168,8 +168,9 @@ public class WeekViewEvent {
         return mDrawableId;
     }
 
-    public void setDrawableId(int mDrawableId) {
-        this.mDrawableId = mDrawableId;
+    public void setDrawableId(int drawableId) {
+        this.mDrawableId = drawableId;
+    }
     }
 
     @Override

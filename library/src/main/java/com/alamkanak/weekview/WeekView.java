@@ -805,17 +805,11 @@ public class WeekView extends View {
             // Calculate left.
             float left = originalLeft + padding;
 
-            // Get drawable.
-            if (event.isAllDay() && event.hasDrawable()) {
-                Drawable drawable = ContextCompat.getDrawable(getContext(), event.getDrawableId());
-                drawable.setBounds((int) left, (int) top, (int) left + mEventDrawableSize, (int) (top + mEventDrawableSize));
-                drawable.draw(canvas);
-
-                // Calculate new left.
-                left = left + mEventDrawableSize + padding;
-
-                // Calculate new available width.
-                availableWidth = availableWidth - mEventDrawableSize - padding;
+            // Add extra space for drawable.
+            if (event.hasDrawable()) {
+                for (int i = 0; i < 5; i++) {
+                    bob.insert(0, " ");
+                }
             }
 
             // Get text.
@@ -823,6 +817,13 @@ public class WeekView extends View {
 
             if (textLayout.getLineCount() > 1) {
                 top = originalTop + (availableHeight - textLayout.getHeight()) / 2;
+            }
+
+            // Draw drawable.
+            if (event.hasDrawable()) {
+                Drawable drawable = ContextCompat.getDrawable(getContext(), event.getDrawableId());
+                drawable.setBounds((int) left, (int) top, (int) left + mEventDrawableSize, (int) (top + mEventDrawableSize));
+                drawable.draw(canvas);
             }
 
             canvas.save();
