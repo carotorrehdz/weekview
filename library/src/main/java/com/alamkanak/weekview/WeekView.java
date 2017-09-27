@@ -443,11 +443,23 @@ public class WeekView extends View {
             float top = mHeaderHeight + mHourHeight + mCurrentOrigin.y + mHourHeight * i;
 
             // Draw the text if its y position is not outside of the visible area. The pivot point of the text is the point at the bottom-right corner.
-            String hour = getDateTimeInterpreter().interpretTime(i + 1);
-            String period = getDateTimeInterpreter().interpretPeriod(i + 1);
+            DateTimeInterpreter dateTimeInterpreter;
 
-            if (hour == null || period == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null time");
+            try {
+                dateTimeInterpreter = getDateTimeInterpreter();
+            } catch (IllegalStateException e) {
+                continue;
+            }
+
+            String hour = dateTimeInterpreter.interpretTime(i + 1);
+            String period = dateTimeInterpreter.interpretPeriod(i + 1);
+
+            if (hour == null) {
+                hour = "";
+            }
+
+            if (period == null) {
+                period = "";
             }
 
             if (top < getHeight()) {
@@ -560,7 +572,7 @@ public class WeekView extends View {
             boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. GeT events only when it is the first iteration of the loop.
-            if (mEventRects == null || mRefreshEvents || (dayNumber == leftDaysWithGaps + 1 && mFetchedPeriod != (int) mWeekViewLoader.toWeekViewPeriodIndex(day) && Math.abs(mFetchedPeriod - mWeekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
+            if (mEventRects == null || mRefreshEvents || (mWeekViewLoader != null && dayNumber == leftDaysWithGaps + 1 && mFetchedPeriod != (int) mWeekViewLoader.toWeekViewPeriodIndex(day) && Math.abs(mFetchedPeriod - mWeekViewLoader.toWeekViewPeriodIndex(day)) > 0.5)) {
                 getMoreEvents(day);
                 mRefreshEvents = false;
             }
