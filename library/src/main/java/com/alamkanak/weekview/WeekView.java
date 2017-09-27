@@ -1319,6 +1319,7 @@ public class WeekView extends View {
      */
     public void goToToday() {
         Calendar today = Calendar.getInstance();
+        goToHour(today.get(Calendar.HOUR_OF_DAY));
         goToDate(today);
     }
 
@@ -1338,6 +1339,7 @@ public class WeekView extends View {
 
         if (mAreDimensionsInvalid) {
             mScrollToDay = date;
+
             return;
         }
 
@@ -1373,17 +1375,21 @@ public class WeekView extends View {
     public void goToHour(double hour) {
         if (mAreDimensionsInvalid) {
             mScrollToHour = hour;
+
             return;
         }
 
         int verticalOffset = 0;
-        if (hour > 24)
-            verticalOffset = mHourHeight * 24;
-        else if (hour > 0)
-            verticalOffset = (int) (mHourHeight * hour);
 
-        if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderHeight + mHourHeight)
+        if (hour > 24) {
+            verticalOffset = mHourHeight * 24;
+        } else if (hour > 0) {
+            verticalOffset = (int) (mHourHeight * hour);
+        }
+
+        if (verticalOffset > mHourHeight * 24 - getHeight() + mHeaderHeight + mHourHeight) {
             verticalOffset = (int) (mHourHeight * 24 - getHeight() + mHeaderHeight + mHourHeight);
+        }
 
         mCurrentOrigin.y = -verticalOffset;
         invalidate();
