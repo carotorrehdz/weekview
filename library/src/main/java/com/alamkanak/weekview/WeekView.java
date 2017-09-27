@@ -9,6 +9,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -83,6 +84,7 @@ public class WeekView extends View {
     private int mGrayTextColor = Color.rgb(160, 168, 170);
     private int mRedTextColor = Color.rgb(255, 67, 55);
     private int mTextSize = 0;
+    private int mNumberTextSize = 0;
 
     // Background.
     private Paint mBackgroundPaint;
@@ -98,7 +100,9 @@ public class WeekView extends View {
     private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mNumberOfVisibleDays = 5;
     private float mHeaderHeight;
+    private Paint mHeaderNumberTextPaint;
     private Paint mHeaderTextPaint;
+    private Paint mHeaderTodayPaint;
 
     // All Day.
     private int mAllDayEventHeight = 0;
@@ -308,6 +312,7 @@ public class WeekView extends View {
 
         try {
             mTextSize = a.getDimensionPixelSize(R.styleable.WeekView_textSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mTextSize, context.getResources().getDisplayMetrics()));
+            mNumberTextSize = a.getDimensionPixelSize(R.styleable.WeekView_numberTextSize, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, mNumberTextSize, context.getResources().getDisplayMetrics()));
             mGridThickness = Math.round(a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness) / 2) * 2;
             mGridRadio = mGridThickness / 2;
             mDayHeight = a.getDimensionPixelSize(R.styleable.WeekView_dayHeight, mDayHeight);
@@ -347,9 +352,21 @@ public class WeekView extends View {
 
         // Days.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mHeaderTextPaint.setColor(mBlackTextColor);
-        mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
+        mHeaderTextPaint.setColor(mGrayTextColor);
+        mHeaderTextPaint.setTextAlign(Paint.Align.LEFT);
         mHeaderTextPaint.setTextSize(mTextSize);
+
+        mHeaderNumberTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHeaderNumberTextPaint.setColor(mBlackTextColor);
+        mHeaderNumberTextPaint.setTextAlign(Paint.Align.LEFT);
+        mHeaderNumberTextPaint.setTextSize(mNumberTextSize);
+        mHeaderNumberTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        mHeaderTodayPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHeaderTodayPaint.setColor(mRedTextColor);
+        mHeaderTodayPaint.setTextAlign(Paint.Align.LEFT);
+        mHeaderTodayPaint.setTextSize(mNumberTextSize);
+        mHeaderTodayPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // All Day.
         mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -650,16 +667,38 @@ public class WeekView extends View {
             // Check if the day is today.
             day = (Calendar) today.clone();
             day.add(Calendar.DATE, dayNumber - 1);
+            boolean sameDay = isSameDay(day, today);
 
             // Draw the day labels.
-            String dayLabel = getDateTimeInterpreter().interpretDate(day);
+            DateTimeInterpreter dateTimeInterpreter;
+            float centerX = startPixel + mWidthPerDay / 2.0f;
+            float y = mDayHeight / 2 + mHeaderTextPaint.getTextSize() / 2.0f;
+
+            try {
+                dateTimeInterpreter = getDateTimeInterpreter();
+            } catch (IllegalStateException e) {
+                continue;
+            }
+
+            String dayLabel = dateTimeInterpreter.interpretDay(day);
+            String weekdayLabel = dateTimeInterpreter.interpretWeekday(day);
 
             if (dayLabel == null) {
-                throw new IllegalStateException("A DateTimeInterpreter must not return null date");
+                dayLabel = "";
+            } else {
+                dayLabel = dayLabel + " ";
+            }
+
+            if (weekdayLabel == null) {
+                weekdayLabel = "";
             }
 
             // Draw day text.
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mDayHeight / 2 + mHeaderTextPaint.getTextSize() / 2, mHeaderTextPaint);
+            Paint paint = sameDay ? mHeaderTodayPaint : mHeaderNumberTextPaint;
+            canvas.drawText(dayLabel, centerX - paint.measureText(dayLabel), y, sameDay ? mHeaderTodayPaint : mHeaderNumberTextPaint);
+
+            // Draw weekday text.
+            canvas.drawText(weekdayLabel, centerX, y, mHeaderTextPaint);
 
             // Day right line.
             canvas.drawLine(startPixel + mWidthPerDay - mGridRadio, 0, startPixel + mWidthPerDay - mGridRadio, mHeaderHeight, mGridPaint);

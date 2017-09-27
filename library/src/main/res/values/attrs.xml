@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="WeekView">
         <attr name="textSize" format="dimension" />
+        <attr name="numberTextSize" format="dimension" />
         <attr name="gridThickness" format="dimension" />
         <attr name="dayHeight" format="dimension" />
         <attr name="firstDayOfWeek" format="enum">

@@ -116,11 +116,18 @@ public abstract class BaseActivity extends AppCompatActivity implements WeekView
     private void setupDateTimeInterpreter() {
         mWeekView.setDateTimeInterpreter(new DateTimeInterpreter() {
             @Override
-            public String interpretDate(Calendar date) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("d EEE", Locale.getDefault());
+            public String interpretWeekday(Calendar date) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEE", Locale.getDefault());
                 String weekday = dateFormat.format(date.getTime());
 
                 return WordUtils.capitalize(weekday).replace(".", "");
+            }
+
+            @Override
+            public String interpretDay(Calendar date) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("d", Locale.getDefault());
+
+                return dateFormat.format(date.getTime());
             }
 
             @Override

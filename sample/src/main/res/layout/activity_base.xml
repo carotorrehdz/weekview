@@ -21,6 +21,7 @@
         app:maxHourHeight="120dp"
         app:minHourHeight="40dp"
         app:nowLineThickness="0.5dp"
+        app:numberTextSize="16sp"
         app:overlappingEventGap="2dp"
         app:textSize="14sp"
         app:timeColumnPadding="8dp" />
