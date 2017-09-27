@@ -787,7 +787,7 @@ public class WeekView extends View {
             bob.append(event.getLocation());
         }
 
-        int availableHeight = (int) (rect.bottom - originalTop);
+        int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
         int availableWidth = (int) (rect.right - originalLeft - mEventPadding * 2);
 
         // Get text dimensions.
@@ -796,14 +796,14 @@ public class WeekView extends View {
 
         if (availableHeight >= lineHeight) {
             // Calculate top.
-            float top = originalTop + (availableHeight - lineHeight) / 2;
+            float top = originalTop + mEventPadding + (availableHeight - lineHeight) / 2.0f;
 
             // Calculate left.
             float left = originalLeft + mEventPadding;
 
             // Add extra space for drawable.
             if (event.hasDrawable()) {
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i <= 5; i++) {
                     bob.insert(0, " ");
                 }
             }
@@ -812,7 +812,7 @@ public class WeekView extends View {
             textLayout = getTruncatedEventTitle(bob, availableHeight, availableWidth, lineHeight, event.isAllDay());
 
             if (textLayout.getLineCount() > 1) {
-                top = originalTop + (availableHeight - textLayout.getHeight()) / 2;
+                top = originalTop + mEventPadding + (availableHeight - textLayout.getHeight()) / 2.0f;
             }
 
             // Draw drawable.
