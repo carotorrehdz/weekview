@@ -3,6 +3,7 @@ package com.alamkanak.weekview;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
 
@@ -19,6 +20,7 @@ public class WeekViewEvent {
     private int mColor;
     private boolean mAllDay;
     private int mDrawableId;
+    private int mType;
 
     public WeekViewEvent() {
 
@@ -171,6 +173,25 @@ public class WeekViewEvent {
     public void setDrawableId(int drawableId) {
         this.mDrawableId = drawableId;
     }
+
+    public int getType() {
+        return mType;
+    }
+
+    public void setType(int type) {
+        this.mType = type;
+
+        if (type == 2) {
+            Calendar newEndTime = (Calendar) mStartTime.clone();
+            newEndTime.add(Calendar.MINUTE, 30);
+            mEndTime = newEndTime;
+        }
+    }
+
+    public int getDuration() {
+        long duration = mEndTime.getTime().getTime() - mStartTime.getTime().getTime();
+
+        return (int) TimeUnit.MILLISECONDS.toMinutes(duration);
     }
 
     @Override
