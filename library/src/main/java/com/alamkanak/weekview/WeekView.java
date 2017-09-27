@@ -9,7 +9,6 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
@@ -103,7 +102,6 @@ public class WeekView extends View {
 
     // All Day.
     private int mAllDayEventHeight = 0;
-    private int mAllDayEventPadding = 0;
     private Paint mAllDayBackgroundPaint;
     private Paint mAllDayTextPaint;
     private String mAllDayText;
@@ -316,7 +314,6 @@ public class WeekView extends View {
             mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
             mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
-            mAllDayEventPadding = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventPadding, mAllDayEventPadding);
             mAllDayText = a.getString(R.styleable.WeekView_allDayText);
             mHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_hourHeight, mHourHeight);
             mMaxHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_maxHourHeight, mMaxHourHeight);
@@ -353,29 +350,28 @@ public class WeekView extends View {
         mHeaderTextPaint.setColor(mBlackTextColor);
         mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
         mHeaderTextPaint.setTextSize(mTextSize);
-        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         // All Day.
         mAllDayTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mAllDayTextPaint.setColor(mGrayTextColor);
         mAllDayTextPaint.setTextAlign(Paint.Align.CENTER);
         mAllDayTextPaint.setTextSize(mTextSize);
-        mAllDayTextPaint.setColor(mGrayTextColor);
 
         mAllDayBackgroundPaint = new Paint();
         mAllDayBackgroundPaint.setColor(Color.rgb(247, 248, 248));
 
         // Time.
         mHourPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mHourPaint.setColor(mBlackTextColor);
         mHourPaint.setTextAlign(Paint.Align.LEFT);
         mHourPaint.setTextSize(mTextSize);
-        mHourPaint.setColor(mBlackTextColor);
         Rect rect = new Rect();
         mHourPaint.getTextBounds(TIME_TEXT, 0, TIME_TEXT.length(), rect);
 
         mPeriodPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPeriodPaint.setColor(mGrayTextColor);
         mPeriodPaint.setTextAlign(Paint.Align.LEFT);
         mPeriodPaint.setTextSize(mTextSize);
-        mPeriodPaint.setColor(mGrayTextColor);
 
         mTimeColumnWidth = mAllDayTextPaint.measureText(mAllDayText) + mTimeColumnPadding * 2;
         mTimeTextHeight = rect.height();
@@ -392,6 +388,7 @@ public class WeekView extends View {
         mEventTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
         mEventTextPaint.setStyle(Paint.Style.FILL);
         mEventTextPaint.setColor(Color.WHITE);
+        mEventTextPaint.setTextAlign(Paint.Align.LEFT);
         mEventTextPaint.setTextSize(mEventTextSize);
 
         // Scrolling.
@@ -790,9 +787,8 @@ public class WeekView extends View {
             bob.append(event.getLocation());
         }
 
-        int padding = event.isAllDay() ? mAllDayEventPadding : mEventPadding;
         int availableHeight = (int) (rect.bottom - originalTop);
-        int availableWidth = (int) (rect.right - originalLeft - padding * 2);
+        int availableWidth = (int) (rect.right - originalLeft - mEventPadding * 2);
 
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
@@ -803,7 +799,7 @@ public class WeekView extends View {
             float top = originalTop + (availableHeight - lineHeight) / 2;
 
             // Calculate left.
-            float left = originalLeft + padding;
+            float left = originalLeft + mEventPadding;
 
             // Add extra space for drawable.
             if (event.hasDrawable()) {

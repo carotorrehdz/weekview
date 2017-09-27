@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:allDayEventHeight="30dp"
-        app:allDayEventPadding="4dp"
         app:allDayText="@string/all_day"
         app:dayHeight="60dp"
         app:eventCornerRadius="2dp"
