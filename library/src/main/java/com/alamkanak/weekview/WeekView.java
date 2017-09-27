@@ -124,8 +124,10 @@ public class WeekView extends View {
     private Paint mPeriodPaint;
 
     // Now.
-    private int mNowLineColor = Color.rgb(81, 91, 94);
+    private int mNowCircleRadius = 0;
+    private int mNowColor = Color.rgb(81, 91, 94);
     private int mNowLineThickness = 0;
+    private Paint mNowCirclePaint;
     private Paint mNowLinePaint;
 
     // Events.
@@ -325,7 +327,8 @@ public class WeekView extends View {
             mMinHourHeight = a.getDimensionPixelSize(R.styleable.WeekView_minHourHeight, mMinHourHeight);
             mEffectiveMinHourHeight = mMinHourHeight;
             mTimeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, mTimeColumnPadding);
-            mNowLineThickness = a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness);
+            mNowLineThickness = Math.round(a.getDimensionPixelSize(R.styleable.WeekView_nowLineThickness, mNowLineThickness) / 2) * 2;
+            mNowCircleRadius = a.getDimensionPixelSize(R.styleable.WeekView_nowCircleRadius, mNowCircleRadius);
             mEventCornerRadius = a.getDimensionPixelSize(R.styleable.WeekView_eventCornerRadius, mEventCornerRadius);
             mEventDrawableSize = a.getDimensionPixelSize(R.styleable.WeekView_eventDrawableSize, mEventDrawableSize);
             mEventMargin = a.getDimensionPixelSize(R.styleable.WeekView_eventMargin, mEventMargin);
@@ -394,9 +397,14 @@ public class WeekView extends View {
         mTimeTextHeight = rect.height();
 
         // Now.
+        mNowCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mNowCirclePaint.setColor(mNowColor);
+        mNowCirclePaint.setStrokeWidth(mNowCircleRadius);
+        mNowCirclePaint.setStyle(Paint.Style.FILL);
+
         mNowLinePaint = new Paint();
         mNowLinePaint.setStrokeWidth(mNowLineThickness);
-        mNowLinePaint.setColor(mNowLineColor);
+        mNowLinePaint.setColor(mNowColor);
 
         // Events.
         mEventBackgroundPaint = new Paint();
@@ -624,10 +632,11 @@ public class WeekView extends View {
 
             // Draw the line at the current time.
             if (sameDay) {
-                float startY = mHeaderHeight + mTimeTextHeight / 2 + mCurrentOrigin.y;
+                float startY = mHeaderHeight + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();
                 float beforeNow = (now.get(Calendar.HOUR_OF_DAY) + now.get(Calendar.MINUTE) / 60.0f) * mHourHeight;
                 canvas.drawLine(start, startY + beforeNow, startPixel + mWidthPerDay, startY + beforeNow, mNowLinePaint);
+                canvas.drawCircle(start, startY + beforeNow, mNowCircleRadius, mNowCirclePaint);
             }
 
             // In the next iteration, start from the next day.

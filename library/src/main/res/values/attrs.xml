@@ -22,6 +22,7 @@
         <attr name="maxHourHeight" format="dimension" />
         <attr name="timeColumnPadding" format="dimension" />
         <attr name="nowLineThickness" format="dimension" />
+        <attr name="nowCircleRadius" format="dimension" />
         <attr name="eventCornerRadius" format="dimension" />
         <attr name="eventDrawableSize" format="dimension" />
         <attr name="eventMargin" format="dimension" />
