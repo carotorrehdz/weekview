@@ -63,6 +63,8 @@ public class WeekView extends View {
     private boolean mIsZooming;
     private boolean mRefreshEvents = false;
     private Calendar mScrollToDay = null;
+    private Calendar mLastVisibleDay;
+    private Calendar mFirstVisibleDay;
     private Direction mCurrentFlingDirection = Direction.NONE;
     private Direction mCurrentScrollDirection = Direction.NONE;
     private double mScrollToHour = -1;
@@ -146,6 +148,7 @@ public class WeekView extends View {
     private EmptyViewLongPressListener mEmptyViewLongPressListener;
     private EventClickListener mEventClickListener;
     private EventLongPressListener mEventLongPressListener;
+    private ScrollListener mScrollListener;
     private WeekViewLoader mWeekViewLoader;
 
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
@@ -583,17 +586,20 @@ public class WeekView extends View {
         canvas.drawRect(mTimeColumnWidth, mHeaderHeight, getWidth(), getHeight(), mBackgroundPaint);
 
         // Iterate through each day.
-        Calendar mFirstVisibleDay = (Calendar) today.clone();
+        Calendar oldFirstVisibleDay = mFirstVisibleDay;
+        mFirstVisibleDay = (Calendar) today.clone();
         mFirstVisibleDay.add(Calendar.DATE, -(Math.round(mCurrentOrigin.x / mWidthPerDay)));
 
-        Calendar lastVisibleDay;
+        if (!mFirstVisibleDay.equals(oldFirstVisibleDay) && mScrollListener != null) {
+            mScrollListener.onFirstVisibleDayChanged(mFirstVisibleDay, oldFirstVisibleDay);
+        }
 
         for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
             day = (Calendar) today.clone();
-            lastVisibleDay = (Calendar) day.clone();
+            mLastVisibleDay = (Calendar) day.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            lastVisibleDay.add(Calendar.DATE, dayNumber - 2);
+            mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
             boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. GeT events only when it is the first iteration of the loop.
@@ -1287,6 +1293,10 @@ public class WeekView extends View {
 
     public EmptyViewLongPressListener getEmptyViewLongPressListener() {
         return mEmptyViewLongPressListener;
+    }
+
+    public void setScrollListener(ScrollListener scrolledListener) {
+        this.mScrollListener = scrolledListener;
     }
 
     /**
