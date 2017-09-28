@@ -5,15 +5,6 @@
         <attr name="numberTextSize" format="dimension" />
         <attr name="gridThickness" format="dimension" />
         <attr name="dayHeight" format="dimension" />
-        <attr name="firstDayOfWeek" format="enum">
-            <enum name="sunday" value="1" />
-            <enum name="monday" value="2" />
-            <enum name="tuesday" value="3" />
-            <enum name="wednesday" value="4" />
-            <enum name="thursday" value="5" />
-            <enum name="friday" value="6" />
-            <enum name="saturday" value="7" />
-        </attr>
         <attr name="noOfVisibleDays" format="integer" />
         <attr name="allDayEventHeight" format="dimension" />
         <attr name="allDayText" format="string" />

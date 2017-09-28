@@ -99,7 +99,6 @@ public class WeekView extends View {
     // Days.
     private float mWidthPerDay;
     private int mDayHeight = 0;
-    private int mFirstDayOfWeek = Calendar.MONDAY;
     private int mNumberOfVisibleDays = 5;
     private float mHeaderHeight;
     private Paint mHeaderNumberTextPaint;
@@ -321,7 +320,6 @@ public class WeekView extends View {
             mGridThickness = Math.round(a.getDimensionPixelSize(R.styleable.WeekView_gridThickness, mGridThickness) / 2) * 2;
             mGridRadio = mGridThickness / 2;
             mDayHeight = a.getDimensionPixelSize(R.styleable.WeekView_dayHeight, mDayHeight);
-            mFirstDayOfWeek = a.getInteger(R.styleable.WeekView_firstDayOfWeek, mFirstDayOfWeek);
             mNumberOfVisibleDays = a.getInteger(R.styleable.WeekView_noOfVisibleDays, mNumberOfVisibleDays);
             mAllDayEventHeight = a.getDimensionPixelSize(R.styleable.WeekView_allDayEventHeight, mAllDayEventHeight);
             mAllDayText = a.getString(R.styleable.WeekView_allDayText);
@@ -526,15 +524,6 @@ public class WeekView extends View {
             mScrollToDay = null;
             mScrollToHour = -1;
             mAreDimensionsInvalid = false;
-        }
-
-        if (mIsFirstDraw) {
-            mIsFirstDraw = false;
-
-            // If the week view is being drawn for the first time, then consider the first day of the week.
-            if (today.get(Calendar.DAY_OF_WEEK) != mFirstDayOfWeek) {
-                mCurrentOrigin.x += mWidthPerDay * (today.get(Calendar.DAY_OF_WEEK) - mFirstDayOfWeek);
-            }
         }
 
         // Calculate the new height due to the zooming.
