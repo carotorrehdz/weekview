@@ -723,7 +723,7 @@ public class WeekView extends View {
      */
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
-            float minuteHeight = (mHourHeight - mEventMargin * 2 - mGridRadio) / 60.0f;
+            float minuteHeight = mHourHeight / 60.0f;
 
             for (int i = 0; i < mEventRects.size(); i++) {
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
@@ -731,7 +731,7 @@ public class WeekView extends View {
                     float top = mHourHeight * 24 * mEventRects.get(i).top / 1440 + mCurrentOrigin.y + mHeaderHeight + mEventMargin;
 
                     // Calculate bottom.
-                    float bottom = top + minuteHeight * mEventRects.get(i).bottom;
+                    float bottom = top + minuteHeight * mEventRects.get(i).bottom - mGridThickness - mEventMargin;
 
                     // Calculate left and right.
                     float left = startFromPixel + mEventRects.get(i).left * mWidthPerDay;
