@@ -59,11 +59,9 @@ public class WeekView extends View {
     private final Context mContext;
 
     private boolean mAreDimensionsInvalid = true;
-    private boolean mIsFirstDraw = true;
     private boolean mIsZooming;
     private boolean mRefreshEvents = false;
     private Calendar mScrollToDay = null;
-    private Calendar mLastVisibleDay;
     private Calendar mFirstVisibleDay;
     private Direction mCurrentFlingDirection = Direction.NONE;
     private Direction mCurrentScrollDirection = Direction.NONE;
@@ -586,9 +584,9 @@ public class WeekView extends View {
         for (int dayNumber = leftDaysWithGaps + 1; dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1; dayNumber++) {
             // Check if the day is today.
             day = (Calendar) today.clone();
-            mLastVisibleDay = (Calendar) day.clone();
+            Calendar lastVisibleDay = (Calendar) day.clone();
             day.add(Calendar.DATE, dayNumber - 1);
-            mLastVisibleDay.add(Calendar.DATE, dayNumber - 2);
+            lastVisibleDay.add(Calendar.DATE, dayNumber - 2);
             boolean sameDay = isSameDay(day, today);
 
             // Get more events if necessary. We want to store the events 3 months beforehand. GeT events only when it is the first iteration of the loop.
